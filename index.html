@@ -409,7 +409,7 @@ async function exifFor(p){
           cam:[d.Make,d.Model].filter(Boolean).join(" "),
           ap:d.FNumber?("f/"+d.FNumber):null,
           sh:fmtShutter(d.ExposureTime),
-          iso:d.ISO?("ISO "+d.ISO):null,
+          iso:d.ISO?("ISO: "+d.ISO):null,
           fl:d.FocalLength?(Math.round(d.FocalLength)+" мм"):null
         };
       }
@@ -421,8 +421,12 @@ async function exifFor(p){
 function renderExif(e, dateStr){
   lbExif.innerHTML = "";
   const chips = [];
-  if(dateStr) chips.push(dateStr);
-  if(e) [e.cam,e.ap,e.sh,e.iso,e.fl].forEach(c=>{ if(c) chips.push(c); });
+  if(dateStr) chips.push("Снято: " + dateStr);
+  if(e && e.cam) chips.push("Камера: " + e.cam);
+  if(e && e.ap) chips.push("Диафрагма: " + e.ap);
+  if(e && e.sh) chips.push("Выдержка: " + e.sh);
+  if(e && e.iso) chips.push(e.iso);
+  if(e && e.fl) chips.push("Фокусное: " + e.fl);
   if(chips.length){
     chips.forEach(c=>{
       const s = document.createElement("span");
