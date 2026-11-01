@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Имя Фотографа — фотографии</title>
-<meta name="description" content="Художественная фотография. Снято на телефон.">
+<title>Алексей Филонов — фотографии</title>
+<meta name="description" content="Художественные фотографии, снятые на мобильный телефон.">
 <script>
 /* Тема применяется до отрисовки, чтобы не было вспышки */
 (function(){try{
@@ -173,12 +173,11 @@
 
 <!-- HEADER SECTION -->
 <header>
-  <div class="brand">Имя <em>Фотографа</em>.</div>
+  <div class="brand">Алексей <em>Филонов</em>.</div>
   <nav>
     <a href="#about">Обо мне</a>
     <a href="#" target="_blank" rel="noopener">Telegram</a>
-    <a href="#" target="_blank" rel="noopener">Instagram</a>
-    <a href="#" target="_blank" rel="noopener">Flickr</a>
+    <a href="#" target="_blank" rel="noopener">Сообщество realme</a>
     <button id="themeBtn" title="Тема: авто (по времени суток)">◐</button>
   </nav>
 </header>
@@ -187,9 +186,9 @@
 <main>
 
   <section class="hero">
-    <h1>Привет, я <span>Имя</span></h1>
-    <p>Снимаю на телефон — чаще всего по одному-два кадра за раз, но регулярно. Люблю свет, геометрию и моменты, которые легко пропустить.</p>
-    <p>Здесь собираю свои фотоработы. Без гонки за лайками — просто витрина.</p>
+    <h1>Привет, меня зовут <span>Алексей Филонов</span></h1>
+    <p>Снимаю на телефон — чаще всего не больше пары кадров, но регулярно. Люблю свет, геометрию и моменты, которые легко пропустить.</p>
+    <p>Здесь собираю свои фотоработы. Без гонки за лайками — это просто хранилище и витрина.</p>
   </section>
 
   <section class="mosaic" id="mosaic" aria-label="Фотографии"></section>
@@ -197,8 +196,8 @@
   <!-- ABOUT SECTION -->
   <section class="about" id="about">
     <h2>Обо мне</h2>
-    <p>Фотографирую на телефон с камерой, которая всегда со мной. Верю, что дело не в технике: хороший кадр — это взгляд и терпение.</p>
-    <p>Кадры здесь не ранжированы и не отобраны «на конкурс» — это живая лента того, что я замечаю.</p>
+    <p>"Лучшая камера - это та, которая у тебя при себе" (с) Чейз Джарвис. Верю, что дело не в технике, а часто даже наоборот: хороший кадр — это способ передать взгляд и настроение.</p>
+    <p>Кадры здесь не ранжированы и не отобраны для выставки или победы на фотоконкурсе — это живая лента того, что я замечаю, и чем хочу поделиться.</p>
   </section>
   <!-- END ABOUT SECTION -->
 
@@ -206,7 +205,7 @@
 
 <!-- FOOTER SECTION -->
 <footer>
-  © Имя Фотографа · Все фотографии — мои · <a href="mailto:you@example.com">написать мне</a>
+  © Алексей Филонов · Все фотографии — моего авторства · <a href="mailto:fila71@ya.ru">написать мне</a>
 </footer>
 <!-- END FOOTER SECTION -->
 
@@ -253,7 +252,7 @@ function currentMode(){ try{return localStorage.getItem(THEME_KEY)||"auto"}catch
 function applyTheme(){
   const m = currentMode();
   const h = new Date().getHours();
-  const t = (m==="auto") ? ((h>=8&&h<19)?"light":"dark") : m;
+  const t = (m==="auto") ? ((h>=6&&h<18)?"light":"dark") : m;
   document.documentElement.dataset.theme = t;
   const btn = document.getElementById("themeBtn");
   if(btn){
