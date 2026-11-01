@@ -89,12 +89,12 @@
   }
   .tile.big{grid-column:span 2;grid-row:span 2}
   .tile.wide{grid-column:span 2}
- .tile img{
+  .tile img{
     width:100%;height:100%;object-fit:cover;display:block;
     transition:transform .6s cubic-bezier(.2,.6,.2,1);
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
     pointer-events:none;
-}
+  }
   .tile:hover img{transform:scale(1.06)}
   .tile .cap{
     position:absolute;left:0;right:0;bottom:0;
@@ -169,13 +169,13 @@
     .lb-nav.prev{left:4px}.lb-nav.next{right:4px}
   }
   /* ---------- Лайтбокс в светлой теме ---------- */
-[data-theme="light"] #lb{background:rgba(247,245,242,.92)}
-[data-theme="light"] #lbImg{box-shadow:0 24px 70px rgba(0,0,0,.25)}
-[data-theme="light"] .lb-title{color:#1a1a1c}
-[data-theme="light"] .lb-exif .chip{color:#3a3a40;background:rgba(20,20,25,.08)}
-[data-theme="light"] .lb-btn{color:#1a1a1c;background:rgba(20,20,25,.08)}
-[data-theme="light"] .lb-btn:hover{background:rgba(20,20,25,.16)}
-[data-theme="light"] .lb-count{color:#6f6f78}
+  [data-theme="light"] #lb{background:rgba(247,245,242,.92)}
+  [data-theme="light"] #lbImg{box-shadow:0 24px 70px rgba(0,0,0,.25)}
+  [data-theme="light"] .lb-title{color:#1a1a1c}
+  [data-theme="light"] .lb-exif .chip{color:#3a3a40;background:rgba(20,20,25,.08)}
+  [data-theme="light"] .lb-btn{color:#1a1a1c;background:rgba(20,20,25,.08)}
+  [data-theme="light"] .lb-btn:hover{background:rgba(20,20,25,.16)}
+  [data-theme="light"] .lb-count{color:#6f6f78}
 </style>
 </head>
 <body>
@@ -243,7 +243,7 @@
    Ручной EXIF (приоритетнее) — по-прежнему можно:
    {src:"images/IMG_1234.jpg", title:"Название", exif:{cam:"realme 12 Pro+", ap:"f/1.8", sh:"1/120", iso:"100", fl:"24 мм"}} */
 const PHOTOS = [
-  
+
   {src:"photos/reminder-of-warmth.jpg", title:"В память о тепле"},
   {src:"photos/read-not-eat.jpg", title:"Овощи и..."},
   {src:"photos/unity.JPEG", title:"Россия объединяет"},
@@ -405,14 +405,16 @@ async function exifFor(p){
   let e = null;
   try{
     if(typeof exifr !== "undefined"){
-      const d = await exifr.parse(p.src,{pick:["Make","Model","FNumber","ExposureTime","ISO","FocalLength"]});
+      const d = await exifr.parse(p.src,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFilm","DigitalZoomRatio"]});
       if(d){
         e = {
-          cam:[d.Make,d.Model].filter(Boolean).join(" "),
-          ap:d.FNumber?("f/"+d.FNumber):null,
-          sh:fmtShutter(d.ExposureTime),
-          iso:d.ISO?("ISO: "+d.ISO):null,
-          fl:d.FocalLength?(Math.round(d.FocalLength)+" мм"):null
+          cam: d.Model || null,
+          ap: d.FNumber ? ("f/"+(Number.isInteger(d.FNumber)?d.FNumber:d.FNumber.toFixed(1))) : null,
+          sh: fmtShutter(d.ExposureTime),
+          iso: d.ISO ? ("ISO: "+d.ISO) : null,
+          fl: d.FocalLength ? (Math.round(d.FocalLength)+" мм") : null,
+          fl35: d.FocalLengthIn35mmFilm ? (Math.round(d.FocalLengthIn35mmFilm)+" мм экв.") : null,
+          zoom: d.DigitalZoomRatio && d.DigitalZoomRatio>1 ? ("Зум ×"+d.DigitalZoomRatio.toFixed(1)) : null
         };
       }
     }
@@ -429,6 +431,8 @@ function renderExif(e, dateStr){
   if(e && e.sh) chips.push("Выдержка: " + e.sh);
   if(e && e.iso) chips.push(e.iso);
   if(e && e.fl) chips.push("Фокусное: " + e.fl);
+  if(e && e.fl35) chips.push(e.fl35);
+  if(e && e.zoom) chips.push(e.zoom);
   if(chips.length){
     chips.forEach(c=>{
       const s = document.createElement("span");
