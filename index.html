@@ -228,8 +228,11 @@
 /* ============ СПИСОК ФОТОГРАФИЙ ============
    Своя фотография: кладёте файл рядом с index.html (или в папку images/)
    и добавляете строку:  {src:"images/IMG_1234.jpg", title:"Название"},
-   EXIF подтянется из самого файла автоматически.
-   Ручной вариант EXIF (приоритетнее): exif:{cam:"realme 12 Pro+", ap:"f/1.8", sh:"1/120", iso:"100", fl:"24 мм"} */
+   ПОРЯДОК СТРОК НЕ ВАЖЕН — сайт сам прочитает дату съёмки из EXIF
+   и расставит плитки хронологически: новые сверху.
+   Кадры без даты в EXIF остаются в конце, в порядке массива.
+   Ручной EXIF (приоритетнее) — по-прежнему можно:
+   {src:"images/IMG_1234.jpg", title:"Название", exif:{cam:"realme 12 Pro+", ap:"f/1.8", sh:"1/120", iso:"100", fl:"24 мм"}} */
 const PHOTOS = [
   {src:"https://picsum.photos/seed/ph01/1200/900.jpg", title:"Утренний свет"},
   {src:"https://picsum.photos/seed/ph02/1600/760.jpg", title:"Геометрия"},
@@ -252,7 +255,7 @@ function currentMode(){ try{return localStorage.getItem(THEME_KEY)||"auto"}catch
 function applyTheme(){
   const m = currentMode();
   const h = new Date().getHours();
-  const t = (m==="auto") ? ((h>=6&&h<18)?"light":"dark") : m;
+  const t = (m==="auto") ? ((h>=8&&h<19)?"light":"dark") : m;
   document.documentElement.dataset.theme = t;
   const btn = document.getElementById("themeBtn");
   if(btn){
@@ -277,7 +280,12 @@ const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("vis"); io.unobserve(e.target); } });
 },{threshold:.1});
 
-PHOTOS.forEach((p,i)=>{
+/* order — список фото с индексом и датой; после сортировки задаёт порядок плиток и лайтбокса */
+const order = PHOTOS.map((p,i)=>({p,i,date:null}));
+const tileEls = new Array(PHOTOS.length);
+
+function addTile(idx){
+  const p = PHOTOS[idx];
   const t = document.createElement("div");
   t.className = "tile";
   const img = document.createElement("img");
@@ -292,10 +300,50 @@ PHOTOS.forEach((p,i)=>{
     if(r>1.5) t.classList.add("wide");
     else if(r>0.8 && r<1.25) t.classList.add("big");
   });
-  t.addEventListener("click",()=>openLb(i));
+  t.addEventListener("click",()=>{
+    const pos = order.findIndex(o=>o.i===idx);
+    openLb(pos);
+  });
   gallery.appendChild(t);
   io.observe(t);
-});
+  tileEls[idx] = t;
+}
+
+/* сначала рисуем плитки сразу, в порядке массива — чтобы витрина не ждала */
+order.forEach(o=>addTile(o.i));
+
+/* ждём библиотеку exifr (но не дольше трёх секунд — если CDN недоступен,
+   просто остаёмся в исходном порядке) */
+function whenExifr(ms){
+  return new Promise(res=>{
+    if(typeof exifr !== "undefined") return res();
+    const start = Date.now();
+    const t = setInterval(()=>{
+      if(typeof exifr !== "undefined" || Date.now()-start>ms){
+        clearInterval(t); res();
+      }
+    },50);
+  });
+}
+
+(async function sortByDate(){
+  await whenExifr(3000);
+  if(typeof exifr === "undefined") return;
+  await Promise.all(order.map(async o=>{
+    try{
+      const d = await exifr.parse(o.p.src,{pick:["DateTimeOriginal","CreateDate","ModifyDate"]});
+      if(d) o.date = d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null;
+    }catch(e){ /* нет EXIF или файл недоступен */ }
+  }));
+  /* новые — сверху; чтобы старые были сверху, поменяйте знаки сравнения */
+  order.sort((a,b)=>{
+    if(a.date && b.date) return b.date - a.date;
+    if(a.date) return -1;
+    if(b.date) return 1;
+    return a.i - b.i;
+  });
+  order.forEach(o=>gallery.appendChild(tileEls[o.i])); /* переставляем уже созданные плитки */
+})();
 
 /* ---------- Запрет контекстного меню и перетаскивания фото ---------- */
 document.addEventListener("contextmenu",e=>{ if(e.target.tagName==="IMG") e.preventDefault(); });
@@ -313,6 +361,10 @@ const exifCache = new Map();
 function fmtShutter(t){
   if(!t) return null;
   return t>=1 ? t.toFixed(1).replace(".0","")+" с" : "1/"+Math.round(1/t);
+}
+function fmtDate(d){
+  if(!d || !(d instanceof Date)) return null;
+  return d.toLocaleDateString("ru-RU",{day:"2-digit",month:"long",year:"numeric"});
 }
 async function exifFor(p){
   if(p.exif) return p.exif;
@@ -335,39 +387,39 @@ async function exifFor(p){
   exifCache.set(p.src,e);
   return e;
 }
-function renderExif(e){
+function renderExif(e, dateStr){
   lbExif.innerHTML = "";
-  if(e){
-    const chips = [e.cam,e.ap,e.sh,e.iso,e.fl].filter(Boolean);
-    if(chips.length){
-      chips.forEach(c=>{
-        const s = document.createElement("span");
-        s.className = "chip"; s.textContent = c;
-        lbExif.appendChild(s);
-      });
-      return;
-    }
+  const chips = [];
+  if(dateStr) chips.push(dateStr);
+  if(e) [e.cam,e.ap,e.sh,e.iso,e.fl].forEach(c=>{ if(c) chips.push(c); });
+  if(chips.length){
+    chips.forEach(c=>{
+      const s = document.createElement("span");
+      s.className = "chip"; s.textContent = c;
+      lbExif.appendChild(s);
+    });
+    return;
   }
   const s = document.createElement("span");
   s.className = "chip";
   s.textContent = "EXIF в этом файле не найден";
   lbExif.appendChild(s);
 }
-function openLb(i){
-  cur = i;
-  const p = PHOTOS[cur];
-  lbImg.src = p.src;
-  lbTitle.textContent = p.title || "";
-  lbCount.textContent = (cur+1)+" / "+PHOTOS.length;
+function openLb(pos){
+  cur = pos;
+  const o = order[pos];
+  lbImg.src = o.p.src;
+  lbTitle.textContent = o.p.title || "";
+  lbCount.textContent = (pos+1)+" / "+order.length;
   const ph = document.createElement("span");
   ph.className = "chip"; ph.textContent = "читаю EXIF…";
   lbExif.innerHTML = ""; lbExif.appendChild(ph);
   lb.classList.add("open");
   document.body.style.overflow = "hidden";
-  exifFor(p).then(renderExif);
+  Promise.all([exifFor(o.p)]).then(([e])=>renderExif(e, fmtDate(o.date)));
 }
 function closeLb(){ lb.classList.remove("open"); document.body.style.overflow=""; }
-function step(d){ openLb((cur+d+PHOTOS.length)%PHOTOS.length); }
+function step(d){ openLb((cur+d+order.length)%order.length); }
 
 document.getElementById("lbClose").addEventListener("click",closeLb);
 document.getElementById("lbPrev").addEventListener("click",()=>step(-1));
