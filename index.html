@@ -10,7 +10,7 @@
 (function(){try{
   var m=localStorage.getItem("theme-mode")||"auto";
   var h=new Date().getHours();
-  var t=(m==="auto")?((h>=8&&h<19)?"light":"dark"):m;
+  var t=(m==="auto")?((h>=6&&h<18)?"light":"dark"):m;
   document.documentElement.dataset.theme=t;
 }catch(e){}})();
 </script>
@@ -255,7 +255,7 @@ function currentMode(){ try{return localStorage.getItem(THEME_KEY)||"auto"}catch
 function applyTheme(){
   const m = currentMode();
   const h = new Date().getHours();
-  const t = (m==="auto") ? ((h>=8&&h<19)?"light":"dark") : m;
+  const t = (m==="auto") ? ((h>=6&&h<18)?"light":"dark") : m;
   document.documentElement.dataset.theme = t;
   const btn = document.getElementById("themeBtn");
   if(btn){
