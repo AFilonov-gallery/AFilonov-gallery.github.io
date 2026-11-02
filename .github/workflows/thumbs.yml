@@ -1,11 +1,12 @@
 name: Make thumbnails
 
-on:
+"on":
   push:
     paths:
       - "photos/**"
-    paths-ignore:
-      - "photos/small/**"
+      - "make_thumbs.py"
+      - "!photos/small/**"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,21 +15,26 @@ jobs:
   thumbs:
     runs-on: ubuntu-latest
     steps:
-      - name: Клонируем репозиторий
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Ставим Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
-      - name: Ставим Pillow
+      - name: Устанавливаем Pillow
         run: pip install pillow
 
       - name: Ужимаем фото
         run: python make_thumbs.py
 
       - name: Коммитим миниатюры
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Автоматически ужаты миниатюры"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add photos/small
+          if git diff --cached --quiet; then
+            echo "Изменений нет — коммит не нужен"
+          else
+            git commit -m "Add thumbnails [skip ci]"
+            git push
+          fi
