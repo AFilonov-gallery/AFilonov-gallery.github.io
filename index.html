@@ -168,6 +168,9 @@
   opacity:1;transition:opacity .3s ease;
   }
   .lb-btn{z-index:2}
+  /* подпись EXIF: гаснет и проявляется вместе с кадром */
+  #lb figcaption{opacity:0;transition:opacity .3s ease}
+  #lb figcaption.show{opacity:1}
 </style>
 </head>
 <body>
@@ -400,7 +403,6 @@ async function exifFor(p){
   return e;
 }
 function renderExif(e, dateStr){
-  lbExif.innerHTML = "";
   const chips = [];
   if(dateStr) chips.push("Снято: " + dateStr);
   if(e && e.cam) chips.push("Камера: " + e.cam);
@@ -410,17 +412,13 @@ function renderExif(e, dateStr){
   if(e && e.fl) chips.push("Фокусное: " + e.fl);
   if(e && e.fl35) chips.push(e.fl35);
   if(e && e.zoom) chips.push(e.zoom);
-  /* пустой EXIF не выводим вовсе: строка чипов полностью исчезает */
-  if(!chips.length){
-    lbExif.parentElement.style.display = "none";
-    return;
-  }
-  lbExif.parentElement.style.display = "";
+  lbExif.innerHTML = "";
   chips.forEach(c=>{
     const s = document.createElement("span");
     s.className = "chip"; s.textContent = c;
     lbExif.appendChild(s);
   });
+  return chips.length > 0; /* пустой EXIF — строка просто не проявится */
 }
 function openLb(pos){
   cur = pos;
@@ -471,14 +469,14 @@ function openLb(pos){
     lbImg.removeAttribute("src");
   }
   lbCount.textContent = (pos+1)+" / "+order.length;
-  const ph = document.createElement("span");
-  ph.className = "chip"; ph.textContent = "читаю EXIF…";
-  lbExif.innerHTML = ""; lbExif.appendChild(ph);
-  lbExif.parentElement.style.display = ""; /* до ответа строка видна, потом скрылась бы, если EXIF пуст */
+  lbExif.innerHTML = "";
+  lbExif.parentElement.classList.remove("show"); /* подпись гаснет до готовности новых данных */
   lb.classList.add("open");
   document.body.style.overflow = "hidden";
   Promise.all([exifFor(o.p)]).then(([e])=>{
-    if(cur === pos) renderExif(e, fmtDate(o.date));
+    if(cur !== pos) return; /* пока читали EXIF, ушли к другому кадру */
+    const has = renderExif(e, fmtDate(o.date));
+    if(has) requestAnimationFrame(()=>lbExif.parentElement.classList.add("show"));
   });
   /* оригинал: грузим фоном, декодируем и подменяем одной операцией */
   const full = new Image();
