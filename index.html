@@ -124,9 +124,9 @@
     opacity:0;pointer-events:none;transition:opacity .25s;
   }
   #lb.open{opacity:1;pointer-events:auto}
-  #lb figure{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:94vw;padding:18px}
+  #lb figure{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:97vw;padding:8px}
   #lbImg{
-    max-width:94vw;max-height:74vh;object-fit:contain;display:block;
+    max-width:97vw;max-height:88vh;object-fit:contain;display:block;
     border-radius:6px;box-shadow:0 24px 70px rgba(0,0,0,.55);
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   }
@@ -152,6 +152,7 @@
   .lb-count{position:absolute;bottom:16px;right:20px;color:#aaa;font-size:.8rem;letter-spacing:.05em}
   @media (max-width:640px){
     .lb-nav.prev{left:4px}.lb-nav.next{right:4px}
+    #lbImg{max-height:80vh}
   }
   /* ---------- Лайтбокс в светлой теме ---------- */
   [data-theme="light"] #lb{background:rgba(247,245,242,.92)}
@@ -225,13 +226,13 @@
 
 <script>
 /* ============ СПИСОК ФОТОГРАФИЙ ============
-   Своя фотография: кладёте файл рядом с index.html (или в папку images/)
-   и добавляете строку:  {src:"images/IMG_1234.jpg", title:"Название"},
+   Своя фотография: кладёте файл в папку photos/
+   и добавляете строку:  {src:"photos/IMG_1234.jpg", title:"Название"},
    ПОРЯДОК СТРОК НЕ ВАЖЕН — сайт сам прочитает дату съёмки из EXIF
    и расставит плитки хронологически: новые сверху.
    Кадры без даты в EXIF остаются в конце, в порядке массива.
    Ручной EXIF (приоритетнее) — по-прежнему можно:
-   {src:"images/IMG_1234.jpg", title:"Название", exif:{cam:"realme 12 Pro+", ap:"f/1.8", sh:"1/120", iso:"100", fl:"24 мм"}} */
+   {src:"photos/IMG_1234.jpg", title:"Название", exif:{cam:"realme 12 Pro+", ap:"f/1.8", sh:"1/120", iso:"100", fl:"24 мм"}} */
 const PHOTOS = [
 
   {src:"photos/reminder-of-warmth.jpg", title:"В память о тепле"},
@@ -409,18 +410,17 @@ function renderExif(e, dateStr){
   if(e && e.fl) chips.push("Фокусное: " + e.fl);
   if(e && e.fl35) chips.push(e.fl35);
   if(e && e.zoom) chips.push(e.zoom);
-  if(chips.length){
-    chips.forEach(c=>{
-      const s = document.createElement("span");
-      s.className = "chip"; s.textContent = c;
-      lbExif.appendChild(s);
-    });
+  /* пустой EXIF не выводим вовсе: строка чипов полностью исчезает */
+  if(!chips.length){
+    lbExif.parentElement.style.display = "none";
     return;
   }
-  const s = document.createElement("span");
-  s.className = "chip";
-  s.textContent = "EXIF в этом файле не найден";
-  lbExif.appendChild(s);
+  lbExif.parentElement.style.display = "";
+  chips.forEach(c=>{
+    const s = document.createElement("span");
+    s.className = "chip"; s.textContent = c;
+    lbExif.appendChild(s);
+  });
 }
 function openLb(pos){
   cur = pos;
@@ -474,6 +474,7 @@ function openLb(pos){
   const ph = document.createElement("span");
   ph.className = "chip"; ph.textContent = "читаю EXIF…";
   lbExif.innerHTML = ""; lbExif.appendChild(ph);
+  lbExif.parentElement.style.display = ""; /* до ответа строка видна, потом скрылась бы, если EXIF пуст */
   lb.classList.add("open");
   document.body.style.overflow = "hidden";
   Promise.all([exifFor(o.p)]).then(([e])=>{
