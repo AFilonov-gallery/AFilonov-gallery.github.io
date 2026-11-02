@@ -454,11 +454,13 @@ function openLb(pos){
   const o = order[pos];
   const thumb = o.p.thumb
     || (o.p.src.indexOf("photos/") === 0 ? "photos/small/" + o.p.src.slice(7) : null);
-  lbImg.classList.remove("ready");
-  if(thumb && thumb !== o.p.src){
-    lbImg.src = thumb;             /* мгновенный предпросмотр */
+  const showThumb = thumb && thumb !== o.p.src;
+  if(showThumb){
+    lbImg.src = thumb;              /* тамб из кеша — сразу, без фейда */
+    lbImg.classList.add("ready");
   } else {
-    lbImg.removeAttribute("src");  /* внешним picsum-фото миниатюры нет */
+    lbImg.classList.remove("ready"); /* внешним picsum-фото миниатюры нет — проявляем с нуля */
+    lbImg.removeAttribute("src");
   }
   lbTitle.textContent = o.p.title || "";
   lbCount.textContent = (pos+1)+" / "+order.length;
@@ -470,14 +472,19 @@ function openLb(pos){
   Promise.all([exifFor(o.p)]).then(([e])=>{
     if(cur === pos) renderExif(e, fmtDate(o.date));
   });
-  /* оригинал грузим фоном и подменяем, когда готов */
+  /* оригинал: грузим фоном, декодируем и подменяем одной операцией */
   const full = new Image();
   full.src = o.p.src;
-  full.onload = ()=>{
-    if(cur !== pos) return;        /* пользователь уже ушёл к другому кадру */
-    lbImg.src = o.p.src;
-    requestAnimationFrame(()=>lbImg.classList.add("ready"));
+  const swap = () => {
+    if(cur !== pos) return;          /* пока качалось, ушли к другому кадру */
+    const go = () => {
+      lbImg.src = o.p.src;
+      requestAnimationFrame(()=>lbImg.classList.add("ready"));
+    };
+    if(full.decode) full.decode().then(go).catch(go);
+    else go();
   };
+  if(full.complete) swap(); else full.onload = swap;
 }
 function closeLb(){ lb.classList.remove("open"); document.body.style.overflow=""; }
 function step(d){ openLb((cur+d+order.length)%order.length); }
