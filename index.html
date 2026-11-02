@@ -322,7 +322,8 @@ function addTile(idx){
   const t = document.createElement("div");
   t.className = "tile";
   const img = document.createElement("img");
-  img.src = p.src; img.alt = p.title || "";
+  img.src = p.thumb || (p.src.indexOf("photos/") === 0 ? "photos/small/" + p.src.slice(7) : p.src);
+  img.alt = p.title || "";
   img.loading = "lazy"; img.draggable = false;
   const cap = document.createElement("div");
   cap.className = "cap"; cap.textContent = p.title || "";
