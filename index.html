@@ -178,6 +178,13 @@
   [data-theme="light"] .lb-btn{color:#1a1a1c;background:rgba(20,20,25,.08)}
   [data-theme="light"] .lb-btn:hover{background:rgba(20,20,25,.16)}
   [data-theme="light"] .lb-count{color:#6f6f78}
+  #lbUnder{
+  position:fixed;pointer-events:none;z-index:1;
+  border-radius:6px;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+  opacity:1;transition:opacity .3s ease;
+  }
+  .lb-btn{z-index:2}
 </style>
 </head>
 <body>
@@ -454,12 +461,47 @@ function openLb(pos){
   const o = order[pos];
   const thumb = o.p.thumb
     || (o.p.src.indexOf("photos/") === 0 ? "photos/small/" + o.p.src.slice(7) : null);
+  const wasOpen = lb.classList.contains("open");
+
+  /* кроссфейд: снимок старого кадра, растворяющийся поверх нового */
+  if(wasOpen && lbImg.getAttribute("src") && lbImg.complete){
+    let under = document.getElementById("lbUnder");
+    if(!under){
+      under = document.createElement("img");
+      under.id = "lbUnder";
+      under.alt = "";
+      lb.appendChild(under);
+    }
+    const r = lbImg.getBoundingClientRect();
+    under.src = lbImg.src;
+    under.style.transition = "none";
+    under.style.opacity = "1";
+    under.style.left = r.left + "px";
+    under.style.top = r.top + "px";
+    under.style.width = r.width + "px";
+    under.style.height = r.height + "px";
+    void under.offsetWidth; /* перезапуск анимации растворения */
+    under.style.transition = "";
+    under.style.opacity = "0";
+    clearTimeout(under._t);
+    under._t = setTimeout(()=>under.remove(), 400);
+  }
+
   const showThumb = thumb && thumb !== o.p.src;
   if(showThumb){
-    lbImg.src = thumb;              /* тамб из кеша — сразу, без фейда */
-    lbImg.classList.add("ready");
+    lbImg.src = thumb;
+    if(wasOpen){
+      lbImg.classList.add("ready"); /* перелистывание: тамб сразу, его накрывает кроссфейд */
+    } else {
+      /* первое открытие: тамб мягко проявляется */
+      lbImg.classList.remove("ready");
+      const im = new Image();
+      im.src = thumb;
+      const go = () => requestAnimationFrame(() => lbImg.classList.add("ready"));
+      if(im.decode) im.decode().then(go).catch(go); else go();
+    }
   } else {
-    lbImg.classList.remove("ready"); /* внешним picsum-фото миниатюры нет — проявляем с нуля */
+    lbImg.classList.remove("ready");
     lbImg.removeAttribute("src");
   }
   lbTitle.textContent = o.p.title || "";
@@ -476,7 +518,7 @@ function openLb(pos){
   const full = new Image();
   full.src = o.p.src;
   const swap = () => {
-    if(cur !== pos) return;          /* пока качалось, ушли к другому кадру */
+    if(cur !== pos) return; /* пока качалось, ушли к другому кадру */
     const go = () => {
       lbImg.src = o.p.src;
       requestAnimationFrame(()=>lbImg.classList.add("ready"));
