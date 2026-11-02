@@ -146,6 +146,8 @@
     border-radius:6px;box-shadow:0 24px 70px rgba(0,0,0,.55);
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   }
+  #lbImg{opacity:0;transition:opacity .25s}
+  #lbImg.ready{opacity:1}
   .lb-title{font-size:1.05rem;color:#fff;text-align:center;letter-spacing:.03em}
   .lb-exif{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:80vw}
   .lb-exif .chip{
@@ -450,7 +452,14 @@ function renderExif(e, dateStr){
 function openLb(pos){
   cur = pos;
   const o = order[pos];
-  lbImg.src = o.p.src;
+  const thumb = o.p.thumb
+    || (o.p.src.indexOf("photos/") === 0 ? "photos/small/" + o.p.src.slice(7) : null);
+  lbImg.classList.remove("ready");
+  if(thumb && thumb !== o.p.src){
+    lbImg.src = thumb;             /* мгновенный предпросмотр */
+  } else {
+    lbImg.removeAttribute("src");  /* внешним picsum-фото миниатюры нет */
+  }
   lbTitle.textContent = o.p.title || "";
   lbCount.textContent = (pos+1)+" / "+order.length;
   const ph = document.createElement("span");
@@ -458,7 +467,17 @@ function openLb(pos){
   lbExif.innerHTML = ""; lbExif.appendChild(ph);
   lb.classList.add("open");
   document.body.style.overflow = "hidden";
-  Promise.all([exifFor(o.p)]).then(([e])=>renderExif(e, fmtDate(o.date)));
+  Promise.all([exifFor(o.p)]).then(([e])=>{
+    if(cur === pos) renderExif(e, fmtDate(o.date));
+  });
+  /* оригинал грузим фоном и подменяем, когда готов */
+  const full = new Image();
+  full.src = o.p.src;
+  full.onload = ()=>{
+    if(cur !== pos) return;        /* пользователь уже ушёл к другому кадру */
+    lbImg.src = o.p.src;
+    requestAnimationFrame(()=>lbImg.classList.add("ready"));
+  };
 }
 function closeLb(){ lb.classList.remove("open"); document.body.style.overflow=""; }
 function step(d){ openLb((cur+d+order.length)%order.length); }
