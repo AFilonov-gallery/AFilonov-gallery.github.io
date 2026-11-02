@@ -1,1 +1,34 @@
+name: Make thumbnails
 
+on:
+  push:
+    paths:
+      - "photos/**"
+    paths-ignore:
+      - "photos/small/**"
+
+permissions:
+  contents: write
+
+jobs:
+  thumbs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонируем репозиторий
+        uses: actions/checkout@v4
+
+      - name: Ставим Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Ставим Pillow
+        run: pip install pillow
+
+      - name: Ужимаем фото
+        run: python make_thumbs.py
+
+      - name: Коммитим миниатюры
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Автоматически ужаты миниатюры"
