@@ -37,7 +37,7 @@ def main():
 
 # ---------- Генерация photos/photos.js ----------
 def write_photo_list():
-    list_path = os.path.join(SRC_DIR, "photos.js")
+    list_path = "photos.js"
 
     # читаем старый список: порядок строк и названия переносим как есть
     old_entries = []
