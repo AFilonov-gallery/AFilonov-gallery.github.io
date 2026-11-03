@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Ужимает все JPEG/PNG из photos/ и кладёт миниатюры в photos/small/,
-   а заодно собирает photos/photos.js — список фото для индекса."""
+   а заодно собирает photos.js — список фото для индекса."""
 import os
 import re
 from PIL import Image, ImageOps
@@ -35,7 +35,7 @@ def main():
         except Exception as e:
             print("SKIP ", name, "-", e)
 
-# ---------- Генерация photos/photos.js ----------
+# ---------- Генерация photos.js ----------
 def write_photo_list():
     list_path = "photos.js"
 
