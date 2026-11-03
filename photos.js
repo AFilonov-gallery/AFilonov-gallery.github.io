@@ -83,6 +83,8 @@ window.PHOTOS = [
   {src:"photos/monowheel.JPEG", title:"Monowheel"},
   {src:"photos/through.JPEG", title:"Through"},
   {src:"photos/flash.JPEG", title:"Молния"},
+  {src:"photos/i-suck.JPG", title:"I suck"},
+  {src:"photos/texture-snow.JPEG", title:"Снег"},
   {src:"photos/frost.JPEG", title:"Мороз"},
   {src:"photos/dilema.JPEG", title:"Решала"},
   {src:"photos/soon.JPEG", title:"Soon"},
@@ -91,7 +93,5 @@ window.PHOTOS = [
   {src:"photos/province.JPEG", title:"Прованс"},
   {src:"photos/glitch.JPEG", title:"Навигация"},
   {src:"photos/dusk.JPEG", title:"На закате"},
-  {src:"photos/rails.JPEG", title:"Рельсы"},
-  {src:"photos/i-suck.JPG", title:"I suck"},
-  {src:"photos/texture-snow.JPEG", title:"Снег"},
+  {src:"photos/rails.JPEG", title:"Рельсы"}
 ];
