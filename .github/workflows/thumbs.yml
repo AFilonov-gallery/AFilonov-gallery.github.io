@@ -24,17 +24,17 @@ jobs:
       - name: Устанавливаем Pillow
         run: pip install pillow
 
-      - name: Ужимаем фото
+      - name: Ужимаем фото и собираем список
         run: python make_thumbs.py
 
-      - name: Коммитим миниатюры
+      - name: Коммитим миниатюры и список
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add photos/small
+          git add photos/small photos/photos.js
           if git diff --cached --quiet; then
             echo "Изменений нет — коммит не нужен"
           else
-            git commit -m "Add thumbnails [skip ci]"
+            git commit -m "Обновить миниатюры и список фото [skip ci]"
             git push
           fi
