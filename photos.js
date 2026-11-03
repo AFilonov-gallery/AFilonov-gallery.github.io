@@ -2,8 +2,6 @@
    скрипт запомнит ваш порядок. Новые кадры дописываются в начало списка,
    названия их берутся из имени файла - потом поправьте здесь руками. */
 window.PHOTOS = [
-  {src:"photos/mud.JPG", title:"Mud"},
-  {src:"photos/bricks.JPG", title:"Bricks"},
   {src:"photos/reminder-of-warmth.jpg", title:"В память о тепле"},
   {src:"photos/read-not-eat.jpg", title:"Овощи и..."},
   {src:"photos/cheat-code.jpg", title:"Cheat code"},
@@ -11,6 +9,7 @@ window.PHOTOS = [
   {src:"photos/star-fishing.jpg", title:"Star fishing"},
   {src:"photos/minthe.jpg", title:"Minthe"},
   {src:"photos/after-hours.jpg", title:"After hours"},
+  {src:"photos/bricks.JPG", title:"Bricks"},
   {src:"photos/heart-broken.jpg", title:"Брак"},
   {src:"photos/single.JPEG", title:"Single"},
   {src:"photos/passing-by.JPEG", title:"Passing by"},
@@ -19,6 +18,7 @@ window.PHOTOS = [
   {src:"photos/birdman.JPEG", title:"Курлы"},
   {src:"photos/in-space.JPEG", title:"Космос"},
   {src:"photos/he-s-watching.JPEG", title:"Он следит"},
+  {src:"photos/mud.JPG", title:"Mud"},
   {src:"photos/snowher-to-go.JPEG", title:"Снежная пустыня"},
   {src:"photos/fallen.JPEG", title:"Обочина"},
   {src:"photos/grip.JPEG", title:"Рабочие руки"},
