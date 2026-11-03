@@ -2,5 +2,27 @@
    Названия можно править: для уже добавленных кадров они сохраняются между запусками.
    Для нового кадра название возьмётся из имени файла, потом поправьте руками. */
 window.PHOTOS = [
-
+  {src:"photos/birdman.JPEG", title:"Курлы"},
+  {src:"photos/carpe-diem.JPEG", title:"Carpe Diem"},
+  {src:"photos/dilema.JPEG", title:"Решала"},
+  {src:"photos/dusk.JPEG", title:"На закате"},
+  {src:"photos/fallen.JPEG", title:"Обочина"},
+  {src:"photos/flash.JPEG", title:"Молния"},
+  {src:"photos/for-moms-and-kids.JPEG", title:"Для мам и малышей"},
+  {src:"photos/frost.JPEG", title:"Мороз"},
+  {src:"photos/glitch.JPEG", title:"Навигация"},
+  {src:"photos/grip.JPEG", title:"Рабочие руки"},
+  {src:"photos/he-s-watching.JPEG", title:"Он следит"},
+  {src:"photos/in-space.JPEG", title:"Космос"},
+  {src:"photos/mist.JPEG", title:"Туман"},
+  {src:"photos/province.JPEG", title:"Прованс"},
+  {src:"photos/rails.JPEG", title:"Рельсы"},
+  {src:"photos/read-not-eat.jpg", title:"Овощи и..."},
+  {src:"photos/red-baron.JPEG", title:"Красный барон"},
+  {src:"photos/reminder-of-warmth.jpg", title:"В память о тепле"},
+  {src:"photos/sides.JPEG", title:"Соседи"},
+  {src:"photos/snowher-to-go.JPEG", title:"Снежная пустыня"},
+  {src:"photos/texture-snow.JPEG", title:"Снег"},
+  {src:"photos/unity.JPEG", title:"Россия объединяет"},
+  {src:"photos/up.JPEG", title:"Вверх"}
 ];
