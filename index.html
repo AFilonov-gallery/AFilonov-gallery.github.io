@@ -227,41 +227,9 @@
   <div class="lb-count" id="lbCount"></div>
 </div>
 
+<script src="photos/photos.js"></script>
 <script>
-/* ============ СПИСОК ФОТОГРАФИЙ ============
-   Своя фотография: кладёте файл в папку photos/
-   и добавляете строку:  {src:"photos/IMG_1234.jpg", title:"Название"},
-   ПОРЯДОК СТРОК НЕ ВАЖЕН — сайт сам прочитает дату съёмки из EXIF
-   и расставит плитки хронологически: новые сверху.
-   Кадры без даты в EXIF остаются в конце, в порядке массива.
-   Ручной EXIF (приоритетнее) — по-прежнему можно:
-   {src:"photos/IMG_1234.jpg", title:"Название", exif:{cam:"realme 12 Pro+", ap:"f/1.8", sh:"1/120", iso:"100", fl:"24 мм"}} */
-const PHOTOS = [
-
-  {src:"photos/reminder-of-warmth.jpg", title:"В память о тепле"},
-  {src:"photos/read-not-eat.jpg", title:"Овощи и..."},
-  {src:"photos/unity.JPEG", title:"Россия объединяет"},
-  {src:"photos/for-moms-and-kids.JPEG", title:"Для мам и малышей"},
-  {src:"photos/birdman.JPEG", title:"Курлы"},
-  {src:"photos/in-space.JPEG", title:"Космос"},
-  {src:"photos/he-s-watching.JPEG", title:"Он следит"},
-  {src:"photos/snowher-to-go.JPEG", title:"Снежная пустыня"},
-  {src:"photos/fallen.JPEG", title:"Обочина"},
-  {src:"photos/grip.JPEG", title:"Рабочие руки"},
-  {src:"photos/up.JPEG", title:"Вверх"},
-  {src:"photos/red-baron.JPEG", title:"Красный барон"},
-  {src:"photos/sides.JPEG", title:"Соседи"},
-  {src:"photos/flash.JPEG", title:"Молния"},
-  {src:"photos/texture-snow.JPEG", title:"Снег"},
-  {src:"photos/frost.JPEG", title:"Мороз"},
-  {src:"photos/dilema.JPEG", title:"Решала"},
-  {src:"photos/mist.JPEG", title:"Туман"},
-  {src:"photos/carpe-diem.JPEG", title:"Carpe Diem"},
-  {src:"photos/province.JPEG", title:"Прованс"},
-  {src:"photos/glitch.JPEG", title:"Навигация"},
-  {src:"photos/dusk.JPEG", title:"На закате"},
-  {src:"photos/rails.JPEG", title:"Рельсы"}
-];
+const PHOTOS = window.PHOTOS;
 
 /* ---------- Тема: авто по времени суток + ручной режим ---------- */
 const THEME_KEY = "theme-mode";
