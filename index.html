@@ -229,7 +229,7 @@
 
 <script src="photos/photos.js"></script>
 <script>
-const PHOTOS = window.PHOTOS;
+const PHOTOS = window.PHOTOS || [];
 
 /* ---------- Тема: авто по времени суток + ручной режим ---------- */
 const THEME_KEY = "theme-mode";
@@ -263,8 +263,8 @@ const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("vis"); io.unobserve(e.target); } });
 },{threshold:.1});
 
-/* order — список фото с индексом и датой; после сортировки задаёт порядок плиток и лайтбокса */
-const order = PHOTOS.map((p,i)=>({p,i,date:null}));
+/* порядок плиток и лайтбокса = порядок строк в photos.js, никакой пересортировки */
+const order = PHOTOS.map((p,i)=>({p,i}));
 const tileEls = new Array(PHOTOS.length);
 
 function addTile(idx){
@@ -291,41 +291,7 @@ function addTile(idx){
   tileEls[idx] = t;
 }
 
-/* сначала рисуем плитки сразу, в порядке массива — чтобы витрина не ждала */
 order.forEach(o=>addTile(o.i));
-
-/* ждём библиотеку exifr (но не дольше трёх секунд — если CDN недоступен,
-   просто остаёмся в исходном порядке) */
-function whenExifr(ms){
-  return new Promise(res=>{
-    if(typeof exifr !== "undefined") return res();
-    const start = Date.now();
-    const t = setInterval(()=>{
-      if(typeof exifr !== "undefined" || Date.now()-start>ms){
-        clearInterval(t); res();
-      }
-    },50);
-  });
-}
-
-(async function sortByDate(){
-  await whenExifr(3000);
-  if(typeof exifr === "undefined") return;
-  await Promise.all(order.map(async o=>{
-    try{
-      const d = await exifr.parse(o.p.src,{pick:["DateTimeOriginal","CreateDate","ModifyDate"]});
-      if(d) o.date = d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null;
-    }catch(e){ /* нет EXIF или файл недоступен */ }
-  }));
-  /* новые — сверху; чтобы старые были сверху, поменяйте знаки сравнения */
-  order.sort((a,b)=>{
-    if(a.date && b.date) return b.date - a.date;
-    if(a.date) return -1;
-    if(b.date) return 1;
-    return a.i - b.i;
-  });
-  order.forEach(o=>gallery.appendChild(tileEls[o.i])); /* переставляем уже созданные плитки */
-})();
 
 /* ---------- Запрет контекстного меню и перетаскивания фото ---------- */
 document.addEventListener("contextmenu",e=>{ if(e.target.tagName==="IMG") e.preventDefault(); });
@@ -353,9 +319,10 @@ async function exifFor(p){
   let e = null;
   try{
     if(typeof exifr !== "undefined"){
-      const d = await exifr.parse(p.src,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFilm","DigitalZoomRatio"]});
+      const d = await exifr.parse(p.src,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFilm","DigitalZoomRatio","DateTimeOriginal","CreateDate","ModifyDate"]});
       if(d){
         e = {
+          date: d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null,
           cam: d.Model || null,
           ap: d.FNumber ? ("f/"+(Number.isInteger(d.FNumber)?d.FNumber:d.FNumber.toFixed(1))) : null,
           sh: fmtShutter(d.ExposureTime),
@@ -443,7 +410,7 @@ function openLb(pos){
   document.body.style.overflow = "hidden";
   Promise.all([exifFor(o.p)]).then(([e])=>{
     if(cur !== pos) return; /* пока читали EXIF, ушли к другому кадру */
-    const has = renderExif(e, fmtDate(o.date));
+    const has = renderExif(e, e && e.date ? fmtDate(e.date) : null);
     if(has) requestAnimationFrame(()=>lbExif.parentElement.classList.add("show"));
   });
   /* оригинал: грузим фоном, декодируем и подменяем одной операцией */

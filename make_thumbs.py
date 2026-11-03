@@ -39,12 +39,15 @@ def main():
 def write_photo_list():
     list_path = os.path.join(SRC_DIR, "photos.js")
 
-    # читаем старый список: сохраняем уже заданные названия
+    # читаем старый список: порядок строк и названия переносим как есть
+    old_entries = []
     old_titles = {}
     if os.path.isfile(list_path):
         with open(list_path, encoding="utf-8") as fh:
-            for m in re.finditer(r'src:"([^"]+)"\s*,\s*title:"((?:[^"\\]|\\.)*)"', fh.read()):
-                old_titles[m.group(1)] = m.group(2)
+            text = fh.read()
+        for m in re.finditer(r'\{\s*src:\s*"([^"]+)"\s*,\s*title:\s*"((?:[^"\\]|\\.)*)"', text):
+            old_entries.append(m.group(1))
+            old_titles[m.group(1)] = m.group(2)
 
     def title_from_name(name):
         stem = re.sub(r"\s+", " ", os.path.splitext(name)[0].replace("-", " ").replace("_", " ")).strip()
@@ -53,24 +56,35 @@ def write_photo_list():
     def esc(s):
         return s.replace("\\", "\\\\").replace('"', '\\"')
 
-    files = sorted(
+    files = set(
         f for f in os.listdir(SRC_DIR)
         if f.lower().endswith(EXTS) and os.path.isfile(os.path.join(SRC_DIR, f))
     )
 
+    kept = []      # кадры из старого списка, которые ещё на диске — порядок как был
+    kept_names = set()
+    for src in old_entries:
+        name = src.split("photos/", 1)[-1]
+        if name in files:
+            kept.append(src)
+            kept_names.add(name)
+
+    new = sorted(f for f in files if f not in kept_names)  # новинки — в начало списка
+
+    ordered = ["photos/" + f for f in new] + kept
     items = ",\n".join(
-        '  {{src:"photos/{f}", title:"{t}"}},'.format(
-            f=f, t=esc(old_titles.get("photos/" + f) or title_from_name(f))
+        '  {src:"{s}", title:"{t}"}'.format(
+            s=s, t=esc(old_titles.get(s) or title_from_name(s.split("photos/", 1)[-1]))
         )
-        for f in files
+        for s in ordered
     )
 
     with open(list_path, "w", encoding="utf-8") as fh:
-        fh.write("/* Сгенерировано автоматически из содержимого photos/ — файл make_thumbs.py.\n")
-        fh.write("   Названия можно править: для уже добавленных кадров они сохраняются между запусками.\n")
-        fh.write("   Для нового кадра название возьмётся из имени файла, потом поправьте руками. */\n")
+        fh.write("/* Порядок строк на сайте = порядок строк здесь. Расставьте как хотите -\n")
+        fh.write("   скрипт запомнит ваш порядок. Новые кадры дописываются в начало списка,\n")
+        fh.write("   названия их берутся из имени файла - потом поправьте здесь руками. */\n")
         fh.write("window.PHOTOS = [\n" + items + "\n];\n")
-    print("Список фото:", len(files))
+    print("Список фото:", len(ordered))
 
 if __name__ == "__main__":
     main()
