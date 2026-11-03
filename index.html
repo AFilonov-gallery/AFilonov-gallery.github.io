@@ -210,9 +210,7 @@
 
 <!-- FOOTER SECTION -->
 <footer>
-<footer>
   <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ru" target="_blank" rel="noopener license">CC BY-NC 4.0</a> · © Алексей Филонов · <a href="mailto:fila71@ya.ru">Написать мне</a>
-</footer>
 </footer>
 <!-- END FOOTER SECTION -->
 
@@ -232,7 +230,7 @@
 
 <script src="photos.js"></script>
 <script>
-const PHOTOS = window.PHOTOS || [];
+const PHOTOS = (window.PHOTOS || []).filter(Boolean);
 
 /* ---------- Тема: авто по времени суток + ручной режим ---------- */
 const THEME_KEY = "theme-mode";
@@ -286,7 +284,7 @@ function addTile(idx){
     else if(r>0.8 && r<1.25) t.classList.add("big");
   });
   t.addEventListener("click",()=>{
-    const pos = order.findIndex(o=>o.i===idx);
+    const pos = order.findIndex(o=>o && o.i===idx);
     openLb(pos);
   });
   gallery.appendChild(t);
@@ -294,7 +292,7 @@ function addTile(idx){
   tileEls[idx] = t;
 }
 
-order.forEach(o=>addTile(o.i));
+order.forEach(o=>{ if(o) addTile(o.i); });
 
 /* ---------- Запрет контекстного меню и перетаскивания фото ---------- */
 document.addEventListener("contextmenu",e=>{ if(e.target.tagName==="IMG") e.preventDefault(); });
@@ -361,6 +359,7 @@ function renderExif(e, dateStr){
 function openLb(pos){
   cur = pos;
   const o = order[pos];
+  if(!o) return;
   const thumb = o.p.thumb
     || (o.p.src.indexOf("photos/") === 0 ? "photos/small/" + o.p.src.slice(7) : null);
   const wasOpen = lb.classList.contains("open");
@@ -443,6 +442,37 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowLeft") step(-1);
   if(e.key==="ArrowRight") step(1);
 });
+
+/* ---------- Свайпы в лайтбоксе (смартфоны) ---------- */
+(function(){
+  const EDGE = 24;      /* у краёв не слушаем: там живёт системный жест «назад» */
+  const MIN_DX = 50;    /* минимальная длина горизонтального жеста, px */
+  let sx = 0, sy = 0, active = false;
+
+  lb.addEventListener("touchstart", e=>{
+    if(!lb.classList.contains("open")) return;
+    if(e.touches.length !== 1) return;           /* пинч двумя пальцами — не свайп */
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    if(sx < EDGE || sx > window.innerWidth - EDGE) return;
+    active = true;
+  }, {passive:true});
+
+  lb.addEventListener("touchend", e=>{
+    if(!active) return;
+    active = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    /* горизонтальный жест считаем только при явном перевесе по горизонтали */
+    if(Math.abs(dx) > MIN_DX && Math.abs(dx) > Math.abs(dy)*1.5){
+      dx < 0 ? step(1) : step(-1);
+    }
+  }, {passive:true});
+
+  /* касание сорвалось (прервано системой) — сбрасываем */
+  lb.addEventListener("touchcancel", ()=>{ active = false; }, {passive:true});
+})();
 </script>
 </body>
 </html>
