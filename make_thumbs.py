@@ -72,12 +72,11 @@ def write_photo_list():
     new = sorted(f for f in files if f not in kept_names)  # новинки — в начало списка
 
     ordered = ["photos/" + f for f in new] + kept
-    items = ",\n".join(
-        '  {src:"{s}", title:"{t}"}'.format(
-            s=s, t=esc(old_titles.get(s) or title_from_name(s.split("photos/", 1)[-1]))
-        )
-        for s in ordered
-    )
+    parts = []
+    for s in ordered:
+        t = esc(old_titles.get(s) or title_from_name(s.split("photos/", 1)[-1]))
+        parts.append('  {src:"' + s + '", title:"' + t + '"}')
+    items = ",\n".join(parts)
 
     with open(list_path, "w", encoding="utf-8") as fh:
         fh.write("/* Порядок строк на сайте = порядок строк здесь. Расставьте как хотите -\n")
