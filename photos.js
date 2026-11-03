@@ -6,7 +6,6 @@ window.PHOTOS = [
   {src:"photos/read-not-eat.jpg", title:"Овощи и..."},
   {src:"photos/gospel.JPG", title:"Gospel"},
   {src:"photos/other-side.JPG", title:"Other side"},
-  {src:"photos/coffee.jpg", title:"Coffee"},
   {src:"photos/point-of-view.JPG", title:"Point of view"},
   {src:"photos/idol.JPG", title:"Idol"},
   {src:"photos/divine.JPG", title:"Divine"},
