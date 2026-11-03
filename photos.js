@@ -2,6 +2,11 @@
    скрипт запомнит ваш порядок. Новые кадры дописываются в начало списка,
    названия их берутся из имени файла - потом поправьте здесь руками. */
 window.PHOTOS = [
+  {src:"photos/examine.JPG", title:"Examine"},
+  {src:"photos/ghost.jpg", title:"Ghost"},
+  {src:"photos/shower-car.jpg", title:"Shower car"},
+  {src:"photos/together.JPG", title:"Together"},
+  {src:"photos/we-are-flipped.JPG", title:"We are flipped"},
   {src:"photos/reminder-of-warmth.jpg", title:"В память о тепле"},
   {src:"photos/read-not-eat.jpg", title:"Овощи и..."},
   {src:"photos/beasts.JPG", title:"Beasts"},
