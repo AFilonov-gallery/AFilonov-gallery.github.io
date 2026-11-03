@@ -1,16 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Ужимает все JPEG/PNG из photos/ и кладёт миниатюры в photos/small/,
-   а заодно собирает photos.js — список фото для индекса."""
+"""Ужимает JPEG/PNG из photos/ в photos/small/, конвертирует HEIC -> JPEG
+   (с сохранением EXIF), и генерирует photos.js в корне.
+
+   HEIC-файлы после конвертации удаляются из photos/ — браузеры их не
+   показывают, а в списке должны жить JPEG. Конвертация идёт один раз,
+   при первом же прогоне после загрузки кадра.
+
+   Требование окружения: pip install pillow-heif
+   (для JPEG/PNG достаточно одного Pillow, библиотека подхватывается
+    мягко: если её нет — HEIC просто пропускается с предупреждением).
+"""
 import os
 import re
 from PIL import Image, ImageOps
 
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+    HEIF_OK = True
+except Exception:
+    HEIF_OK = False
+
 SRC_DIR = "photos"
-DST_DIR = os.path.join("photos", "small")
-MAX_SIDE = 900   # большая сторона миниатюры, px
-QUALITY = 78     # качество JPEG, 0-100
-EXTS = (".jpg", ".jpeg", ".png")
+DST_DIR = os.path.join(SRC_DIR, "small")
+MAX_SIDE = 900    # большая сторона миниатюры, px
+QUALITY = 78      # качество JPEG миниатюр, 0-100
+FULL_QUALITY = 92 # качество полноразмерных JPEG, конвертируемых из HEIC
+
+IMG_EXTS = (".jpg", ".jpeg", ".png")
+HEIC_EXTS = (".heic", ".heif")
+
 
 def main():
     os.makedirs(DST_DIR, exist_ok=True)
@@ -18,7 +38,11 @@ def main():
         path = os.path.join(SRC_DIR, name)
         if not os.path.isfile(path):
             continue
-        if not name.lower().endswith(EXTS):
+        low = name.lower()
+        if low.endswith(HEIC_EXTS):
+            convert_heic(path, name)
+            continue
+        if not low.endswith(IMG_EXTS):
             continue
         try:
             img = Image.open(path)
@@ -34,6 +58,48 @@ def main():
             print("OK   ", name)
         except Exception as e:
             print("SKIP ", name, "-", e)
+
+
+def convert_heic(path, name):
+    """HEIC -> полноразмерный JPEG с сохранением EXIF; оригинал удаляется."""
+    if not HEIF_OK:
+        print("SKIP ", name, "- нет библиотеки pillow-heif (pip install pillow-heif)")
+        return
+    stem = os.path.splitext(name)[0]
+    target = os.path.join(SRC_DIR, stem + ".jpg")
+    if os.path.isfile(target):
+        print("SKIP ", name, "- уже есть", stem + ".jpg, конфликт имён")
+        return
+    try:
+        img = Image.open(path)
+        img = ImageOps.exif_transpose(img)  # разворот по EXIF, ориентация -> 1
+        exif_bytes = img.info.get("exif")   # полный EXIF уже с исправленной ориентацией
+        img = img.convert("RGB")
+        img.save(target, "JPEG", quality=FULL_QUALITY, optimize=True,
+                 **({"exif": exif_bytes} if exif_bytes else {}))
+    except Exception as e:
+        print("SKIP ", name, "-", e)
+        return
+    try:
+        os.remove(path)  # HEIC из репозитория больше не нужен
+    except OSError as e:
+        print("WARN ", name, "- не удалось удалить оригинал:", e)
+
+    # миниатюра для только что созданного JPEG
+    try:
+        img = Image.open(target)
+        img = ImageOps.exif_transpose(img).convert("RGB")
+        w, h = img.size
+        k = min(1.0, MAX_SIDE / float(max(w, h)))
+        nw, nh = int(w * k), int(h * k)
+        if k < 1.0:
+            img = img.resize((nw, nh), Image.LANCZOS)
+        img.save(os.path.join(DST_DIR, stem + ".jpg"), "JPEG",
+                 quality=QUALITY, optimize=True)
+    except Exception as e:
+        print("WARN ", stem + ".jpg", "- миниатюра не создалась:", e)
+    print("HEIC ", name, "->", stem + ".jpg (EXIF сохранён)")
+
 
 # ---------- Генерация photos.js ----------
 def write_photo_list():
@@ -58,7 +124,7 @@ def write_photo_list():
 
     files = set(
         f for f in os.listdir(SRC_DIR)
-        if f.lower().endswith(EXTS) and os.path.isfile(os.path.join(SRC_DIR, f))
+        if f.lower().endswith(IMG_EXTS) and os.path.isfile(os.path.join(SRC_DIR, f))
     )
 
     kept = []      # кадры из старого списка, которые ещё на диске — порядок как был
