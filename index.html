@@ -40,8 +40,7 @@
   }
 
   /* ---------- Шапка ---------- */
-  /* сетка: десктоп — один ряд [brand | subnav | theme],
-     мобильный — два ряда: [brand | theme] и [subnav во всю ширину] */
+  /* сетка: один ряд [brand | subnav | theme] на всех экранах */
   header{
     position:sticky;top:0;z-index:50;
     background:var(--panel);
@@ -185,17 +184,8 @@
 
   /* ---------- Мобильная адаптация ---------- */
   @media (max-width:640px){
-    /* шапка в два ряда: бренд + тема, ниже — иконки справа */
-    header{
-      padding:8px 14px;
-      grid-template-columns:1fr auto;
-      grid-template-areas:"brand theme" "subnav subnav";
-      row-gap:4px;
-    }
-    .subnav{justify-content:flex-end;max-height:40px;opacity:1;overflow:hidden;
-      transition:max-height .28s ease,opacity .2s ease}
-    header.collapsed{row-gap:0}
-    header.collapsed .subnav{max-height:0;opacity:0}
+    /* иконки и кнопка темы — в одной строке с брендом */
+    header{padding:8px 14px}
     .hero{padding:48px 16px 28px}
     .mosaic{padding:0 12px 48px;gap:8px;grid-auto-rows:min(60vw,230px)}
     .about{padding:0 16px 44px}
@@ -233,7 +223,7 @@
 <body>
 
 <!-- HEADER SECTION -->
-<header id="siteHeader">
+<header>
   <div class="brand">Алексей <em>Филонов</em></div>
   <nav class="subnav">
     <span class="icons">
@@ -336,24 +326,6 @@ document.getElementById("themeBtn").addEventListener("click",()=>{
 });
 applyTheme();
 setInterval(applyTheme, 60000); /* авто-тема и протухание выбора проверяются раз в минуту */
-
-/* ---------- Мобильная шапка: вторая строка сворачивается при прокрутке ---------- */
-const headerEl = document.getElementById("siteHeader");
-let headerCollapsed = false;
-function updateHeaderCollapse(){
-  if(!window.matchMedia("(max-width:640px)").matches){
-    if(headerCollapsed){ headerCollapsed=false; headerEl.classList.remove("collapsed"); }
-    return;
-  }
-  const c = window.scrollY > 72; /* вторая строка складывается, когда контент ушёл под шапку */
-  if(c !== headerCollapsed){
-    headerCollapsed = c;
-    headerEl.classList.toggle("collapsed", c);
-  }
-}
-window.addEventListener("scroll", updateHeaderCollapse, {passive:true});
-window.addEventListener("resize", updateHeaderCollapse);
-updateHeaderCollapse();
 
 /* ---------- Мозаика ---------- */
 const gallery = document.getElementById("mosaic");
