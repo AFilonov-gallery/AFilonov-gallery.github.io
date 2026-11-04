@@ -7,11 +7,13 @@
 <title>Алексей Филонов — фотографии</title>
 <meta name="description" content="Художественные фотографии, снятые на мобильный телефон.">
 <script>
-/* Тема применяется до отрисовки, чтобы не было вспышки */
+/* Тема применяется до отрисовки, чтобы не было вспышки.
+   Ручной выбор живёт до конца текущего периода (день/ночь), потом снова авто */
 (function(){try{
-  var m=localStorage.getItem("theme-mode")||"auto";
+  var c=JSON.parse(localStorage.getItem("theme-choice")||"null");
   var h=new Date().getHours();
-  var t=(m==="auto")?((h>=6&&h<18)?"light":"dark"):m;
+  var p=(h>=6&&h<18)?"day":"night";
+  var t=(c&&c.p===p)?c.t:((p==="day")?"light":"dark");
   document.documentElement.dataset.theme=t;
 }catch(e){}})();
 </script>
@@ -254,27 +256,33 @@
 <script>
 const PHOTOS = (window.PHOTOS || []).filter(Boolean);
 
-/* ---------- Тема: авто по времени суток + ручной режим ---------- */
-const THEME_KEY = "theme-mode";
-const ICONS = {auto:"◐", light:"☀", dark:"☾"};
-function currentMode(){ try{return localStorage.getItem(THEME_KEY)||"auto"}catch(e){return "auto"} }
+/* ---------- Тема: авто по времени суток; ручной выбор — до смены периода ---------- */
+const THEME_KEY = "theme-choice";
+const ICONS = {light:"☀", dark:"☾"};
+try{ localStorage.removeItem("theme-mode") }catch(e){} /* подчистить старый ключ от прежней логики */
+
+function period(){ const h=new Date().getHours(); return (h>=6&&h<18) ? "day" : "night"; }
+function choice(){
+  try{
+    const c=JSON.parse(localStorage.getItem(THEME_KEY)||"null");
+    return (c && c.p===period()) ? c.t : null;
+  }catch(e){ return null }
+}
 function applyTheme(){
-  const m = currentMode();
-  const h = new Date().getHours();
-  const t = (m==="auto") ? ((h>=6&&h<18)?"light":"dark") : m;
+  const t = choice() || ((period()==="day") ? "light" : "dark");
   document.documentElement.dataset.theme = t;
   const btn = document.getElementById("themeBtn");
   if(btn){
-    btn.textContent = ICONS[m];
-    btn.title = {auto:"Тема: авто по времени суток (клик — сменить режим)",
-                 light:"Тема: светлая (клик — сменить режим)",
-                 dark:"Тема: тёмная (клик — сменить режим)"}[m];
+    btn.textContent = ICONS[t];
+    btn.title = choice()
+      ? "Тема: выбрана вручную (действует до смены времени суток)"
+      : "Тема: авто по времени суток (клик — сменить)";
   }
 }
 document.getElementById("themeBtn").addEventListener("click",()=>{
-  const order = ["auto","light","dark"];
-  const next = order[(order.indexOf(currentMode())+1)%3];
-  try{ localStorage.setItem(THEME_KEY,next) }catch(e){}
+  const shown = document.documentElement.dataset.theme; /* что видит пользователь сейчас */
+  const next = (shown==="light") ? "dark" : "light";
+  try{ localStorage.setItem(THEME_KEY, JSON.stringify({t:next, p:period()})) }catch(e){}
   applyTheme();
 });
 applyTheme();
