@@ -8,7 +8,7 @@
 <meta name="description" content="Художественные фотографии, снятые на мобильный телефон.">
 <script>
 /* Тема применяется до отрисовки, чтобы не было вспышки.
-   Ручной выбор живёт до конца текущего периода (день/ночь), потом снова авто */
+   Ручной выбор хранится парой «тема + период» и действует до смены периода. */
 (function(){try{
   var c=JSON.parse(localStorage.getItem("theme-choice")||"null");
   var h=new Date().getHours();
@@ -157,6 +157,21 @@
   .lb-nav.prev{left:14px}
   .lb-nav.next{right:14px}
   .lb-count{position:absolute;bottom:16px;right:20px;color:#aaa;font-size:.8rem;letter-spacing:.05em}
+
+  /* ---------- Прогресс загрузки оригинала ---------- */
+  #lbBar{
+    width:min(70vw,560px);height:2px;
+    background:rgba(255,255,255,.12);border-radius:1px;overflow:hidden;
+    opacity:0;transition:opacity .3s ease;
+  }
+  #lbBar.show{opacity:1}
+  #lbFill{
+    height:100%;width:0%;background:var(--accent);
+    transition:width .15s linear;
+  }
+  #lbFill.indet{width:30%;animation:indet 1.1s ease-in-out infinite}
+  @keyframes indet{from{transform:translateX(-110%)}to{transform:translateX(380%)}}
+
   /* ---------- Мобильная адаптация ---------- */
   @media (max-width:640px){
     header{padding:10px 14px}
@@ -166,7 +181,8 @@
     /* ключевое: на одной колонке объединения ячеек запрещены,
        иначе браузер создаёт неявный второй столбец и сетка вылезает за экран */
     .tile.big,.tile.wide{grid-column:auto;grid-row:auto}
-    .lb-nav.prev{left:4px}.lb-nav.next{right:4px}
+    /* стрелки на мобильном не нужны: листание свайпом, а кнопки засоряют канву */
+    .lb-nav{display:none}
     #lbImg{max-height:76vh;max-height:76dvh}
     .lb-exif{max-width:92vw}
     .lb-exif .chip{font-size:.72rem;padding:3px 10px}
@@ -180,6 +196,7 @@
   [data-theme="light"] .lb-btn{color:#1a1a1c;background:rgba(20,20,25,.08)}
   [data-theme="light"] .lb-btn:hover{background:rgba(20,20,25,.16)}
   [data-theme="light"] .lb-count{color:#6f6f78}
+  [data-theme="light"] #lbBar{background:rgba(20,20,25,.12)}
   #lbUnder{
   position:fixed;pointer-events:none;z-index:1;
   border-radius:6px;
@@ -201,7 +218,7 @@
     <a href="#about">Обо мне</a>
     <a href="http://t.me/idea_generator" target="_blank" rel="noopener">Telegram</a>
     <a href="https://c.realme.com/ru/user/__oEZr1EenR2ThtkVFx2d__/posts" target="_blank" rel="noopener">Сообщество realme</a>
-    <button id="themeBtn" title="Тема: авто (по времени суток)">◐</button>
+    <button id="themeBtn" title="Тема: авто по времени суток (клик — сменить)">☀</button>
   </nav>
 </header>
 <!-- END HEADER SECTION -->
@@ -245,6 +262,7 @@
   </button>
   <figure>
     <img id="lbImg" alt="" draggable="false">
+    <div id="lbBar"><div id="lbFill"></div></div>
     <figcaption>
       <div class="lb-exif" id="lbExif"></div>
     </figcaption>
@@ -280,13 +298,12 @@ function applyTheme(){
   }
 }
 document.getElementById("themeBtn").addEventListener("click",()=>{
-  const shown = document.documentElement.dataset.theme; /* что видит пользователь сейчас */
-  const next = (shown==="light") ? "dark" : "light";
-  try{ localStorage.setItem(THEME_KEY, JSON.stringify({t:next, p:period()})) }catch(e){}
+  const shown = document.documentElement.dataset.theme;
+  try{ localStorage.setItem(THEME_KEY, JSON.stringify({t:(shown==="light")?"dark":"light", p:period()})) }catch(e){}
   applyTheme();
 });
 applyTheme();
-setInterval(applyTheme, 60000); /* авто-тема сама переключается со временем */
+setInterval(applyTheme, 60000); /* авто-тема и протухание выбора проверяются раз в минуту */
 
 /* ---------- Мозаика ---------- */
 const gallery = document.getElementById("mosaic");
@@ -333,7 +350,11 @@ const lb = document.getElementById("lb");
 const lbImg = document.getElementById("lbImg");
 const lbExif = document.getElementById("lbExif");
 const lbCount = document.getElementById("lbCount");
+const lbBar = document.getElementById("lbBar");
+const lbFill = document.getElementById("lbFill");
 let cur = 0;
+let loadCtl = null;       /* отменяемая загрузка оригинала */
+let lastBlobUrl = null;   /* blob-URL предыдущего оригинала, освобождаем при замене */
 const exifCache = new Map();
 
 function fmtShutter(t){
@@ -342,7 +363,8 @@ function fmtShutter(t){
 }
 function fmtDate(d){
   if(!d || !(d instanceof Date)) return null;
-  return d.toLocaleDateString("ru-RU",{day:"2-digit",month:"long",year:"numeric"});
+  /* day:"numeric" — без ведущего нуля: «1 сентября», а не «01 сентября» */
+  return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"});
 }
 async function exifFor(p){
   if(p.exif) return p.exif;
@@ -385,6 +407,35 @@ function renderExif(e, dateStr){
     lbExif.appendChild(s);
   });
   return chips.length > 0; /* пустой EXIF — строка просто не проявится */
+}
+
+/* ---------- Загрузка оригинала с прогрессом ---------- */
+async function loadOriginal(src, signal){
+  const res = await fetch(src,{signal});
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  const total = +res.headers.get("Content-Length") || 0;
+  if(!res.body || !total){
+    /* размер неизвестен — мягкий индифинит-режим, ждём целиком */
+    lbFill.classList.add("indet");
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  }
+  const reader = res.body.getReader();
+  const chunks = [];
+  let got = 0;
+  for(;;){
+    const {done,value} = await reader.read();
+    if(done) break;
+    chunks.push(value);
+    got += value.length;
+    lbFill.style.width = Math.min(100, Math.round(got/total*100)) + "%";
+  }
+  return URL.createObjectURL(new Blob(chunks));
+}
+function endProgress(){
+  lbBar.classList.remove("show");
+  lbFill.classList.remove("indet");
+  lbFill.style.width = "0%";
 }
 function openLb(pos){
   cur = pos;
@@ -446,19 +497,45 @@ function openLb(pos){
     const has = renderExif(e, e && e.date ? fmtDate(e.date) : null);
     if(has) requestAnimationFrame(()=>lbExif.parentElement.classList.add("show"));
   });
-  /* оригинал: грузим фоном, декодируем и подменяем одной операцией */
-  const full = new Image();
-  full.src = o.p.src;
-  const swap = () => {
-    if(cur !== pos) return; /* пока качалось, ушли к другому кадру */
+
+  /* оригинал: грузим через fetch с прогрессом, показываем из скачанного целиком */
+  if(loadCtl) loadCtl.abort();
+  const ctl = new AbortController();
+  loadCtl = ctl;
+  if(lastBlobUrl){ try{ URL.revokeObjectURL(lastBlobUrl) }catch(e){} lastBlobUrl = null; }
+  lbBar.classList.add("show");
+  lbFill.classList.remove("indet");
+  lbFill.style.width = "0%";
+  loadOriginal(o.p.src, ctl.signal).then(url=>{
+    if(cur !== pos || ctl.signal.aborted){ try{ URL.revokeObjectURL(url) }catch(e){}; return; }
+    lastBlobUrl = url;
+    endProgress();
+    /* декодируем из blob и подменяем одной операцией, без мигания */
+    const im = new Image();
+    im.src = url;
     const go = () => {
-      lbImg.src = o.p.src;
+      if(cur !== pos) return;
+      lbImg.src = url;
       requestAnimationFrame(()=>lbImg.classList.add("ready"));
     };
-    if(full.decode) full.decode().then(go).catch(go);
-    else go();
-  };
-  if(full.complete) swap(); else full.onload = swap;
+    if(im.decode) im.decode().then(go).catch(go); else go();
+  }).catch(err=>{
+    if(ctl.signal.aborted) return;
+    /* запаска: если fetch не сработал, грузим как раньше — обычным <img> */
+    endProgress();
+    const full = new Image();
+    full.src = o.p.src;
+    const swap = () => {
+      if(cur !== pos) return;
+      const go = () => {
+        lbImg.src = o.p.src;
+        requestAnimationFrame(()=>lbImg.classList.add("ready"));
+      };
+      if(full.decode) full.decode().then(go).catch(go);
+      else go();
+    };
+    if(full.complete) swap(); else full.onload = swap;
+  });
 }
 function closeLb(){
   lb.classList.remove("open");
