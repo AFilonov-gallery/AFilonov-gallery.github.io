@@ -179,10 +179,10 @@
   [data-theme="light"] .lb-btn:hover{background:rgba(20,20,25,.16)}
   [data-theme="light"] .lb-count{color:#6f6f78}
   #lbUnder{
-    position:fixed;pointer-events:none;z-index:1;
-    border-radius:6px;
-    box-shadow:0 24px 70px rgba(0,0,0,.55);
-    opacity:1;transition:opacity .3s ease;
+  position:fixed;pointer-events:none;z-index:1;
+  border-radius:6px;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+  opacity:1;transition:opacity .3s ease;
   }
   .lb-btn{z-index:2}
   /* подпись EXIF: гаснет и проявляется вместе с кадром */
@@ -241,7 +241,6 @@
   <button class="lb-btn lb-nav next" id="lbNext" aria-label="Вперёд">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
   </button>
-
   <figure>
     <img id="lbImg" alt="" draggable="false">
     <figcaption>
@@ -352,7 +351,6 @@ async function exifFor(p){
           sh: fmtShutter(d.ExposureTime),
           iso: d.ISO ? ("ISO: "+d.ISO) : null,
           fl: d.FocalLength ? (Math.round(d.FocalLength)+" мм") : null,
-          /* ЭФР: отсекаем нули и бессмысленные единицы, которыми прошивки заполняют поле по умолчанию */
           fl35: d.FocalLengthIn35mmFilm && d.FocalLengthIn35mmFilm > 1 ? (Math.round(d.FocalLengthIn35mmFilm)+" мм") : null,
           zoom: d.DigitalZoomRatio && d.DigitalZoomRatio>1 ? ("Зум ×"+d.DigitalZoomRatio.toFixed(1)) : null
         };
@@ -366,12 +364,11 @@ function renderExif(e, dateStr){
   const chips = [];
   if(dateStr) chips.push("Снято: " + dateStr);
   if(e && e.cam) chips.push("Камера: " + e.cam);
+  if(e && e.fl35) chips.push("ЭФР: " + e.fl35);      /* ЭФР — сразу после камеры */
+  else if(e && e.fl) chips.push("Фокусное: " + e.fl); /* запаска: если ЭФР не записана */
   if(e && e.ap) chips.push("Диафрагма: " + e.ap);
   if(e && e.sh) chips.push("Выдержка: " + e.sh);
   if(e && e.iso) chips.push(e.iso);
-  /* ЭФР — главный чип; фактическое фокусное показываем только если ЭФР в файле нет */
-  if(e && e.fl35) chips.push("ЭФР: " + e.fl35);
-  else if(e && e.fl) chips.push("Фокусное: " + e.fl);
   if(e && e.zoom) chips.push(e.zoom);
   lbExif.innerHTML = "";
   chips.forEach(c=>{
