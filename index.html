@@ -30,7 +30,7 @@
     --accent:#a9761f;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;scroll-padding-top:76px}
   body{
     background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -40,30 +40,47 @@
   }
 
   /* ---------- Шапка ---------- */
+  /* сетка: десктоп — один ряд [brand | subnav | theme],
+     мобильный — два ряда: [brand | theme] и [subnav во всю ширину] */
   header{
     position:sticky;top:0;z-index:50;
     background:var(--panel);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
-    padding:14px 24px;
-    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:12px 24px;
+    display:grid;align-items:center;
+    grid-template-columns:1fr auto auto;
+    grid-template-areas:"brand subnav theme";
+    column-gap:10px;
+    transition:padding .28s ease,gap .28s ease;
   }
-  .brand{font-size:1.15rem;letter-spacing:.04em;font-weight:700}
+  .brand{grid-area:brand;font-size:1.15rem;letter-spacing:.04em;font-weight:700;white-space:nowrap}
   .brand em{font-style:normal;color:var(--accent)}
-  nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  nav a{
+  .subnav{grid-area:subnav;display:flex;align-items:center;gap:6px;justify-content:flex-end}
+  .icons{display:flex;align-items:center;gap:4px}
+  .nav-about{
     color:var(--muted);text-decoration:none;font-size:.9rem;
-    padding:6px 10px;border-radius:6px;
+    padding:6px 10px;border-radius:6px;white-space:nowrap;
     transition:color .2s,background .2s;
   }
-  nav a:hover{color:var(--text);background:var(--hoverbg)}
+  .nav-about:hover{color:var(--text);background:var(--hoverbg)}
+  .icon-link{
+    color:var(--muted);text-decoration:none;
+    display:flex;align-items:center;justify-content:center;
+    padding:6px 8px;border-radius:6px;
+    transition:color .2s,background .2s;
+  }
+  .icon-link:hover{color:var(--text);background:var(--hoverbg)}
+  .icon-link svg{height:16px;width:auto;display:block}
   #themeBtn{
+    grid-area:theme;
     color:var(--muted);background:none;border:1px solid var(--line);
-    font-size:1rem;line-height:1;cursor:pointer;
-    padding:5px 10px;border-radius:6px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    width:34px;height:30px;padding:0;border-radius:6px;
     transition:color .2s,background .2s;
   }
   #themeBtn:hover{color:var(--text);background:var(--hoverbg)}
+  #themeBtn svg{display:block}
 
   /* ---------- Приветствие ---------- */
   .hero{max-width:1500px;margin:0 auto;padding:72px 24px 36px}
@@ -174,7 +191,18 @@
 
   /* ---------- Мобильная адаптация ---------- */
   @media (max-width:640px){
-    header{padding:10px 14px}
+    /* шапка в два ряда: бренд + тема, ниже — «Обо мне» слева и иконки справа */
+    header{
+      padding:8px 14px;
+      grid-template-columns:1fr auto;
+      grid-template-areas:"brand theme" "subnav subnav";
+      row-gap:4px;
+    }
+    .subnav{justify-content:space-between;max-height:40px;opacity:1;overflow:hidden;
+      transition:max-height .28s ease,opacity .2s ease}
+    header.collapsed{row-gap:0}
+    header.collapsed .subnav{max-height:0;opacity:0}
+    html{scroll-padding-top:52px}
     .hero{padding:48px 16px 28px}
     .mosaic{padding:0 12px 48px;gap:8px;grid-auto-rows:min(60vw,230px)}
     .about{padding:0 16px 44px}
@@ -212,14 +240,22 @@
 <body>
 
 <!-- HEADER SECTION -->
-<header>
+<header id="siteHeader">
   <div class="brand">Алексей <em>Филонов</em></div>
-  <nav>
-    <a href="#about">Обо мне</a>
-    <a href="http://t.me/idea_generator" target="_blank" rel="noopener">Telegram</a>
-    <a href="https://c.realme.com/ru/user/__oEZr1EenR2ThtkVFx2d__/posts" target="_blank" rel="noopener">Сообщество realme</a>
-    <button id="themeBtn" title="Тема: авто по времени суток (клик — сменить)">☀</button>
+  <nav class="subnav">
+    <a href="#about" class="nav-about">Обо мне</a>
+    <span class="icons">
+      <a class="icon-link" href="http://t.me/idea_generator" target="_blank" rel="noopener" title="Я в Telegram" aria-label="Я в Telegram">
+        <svg viewBox="185 297 551 458" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true"><path d="M226.328419,494.722069 C372.088573,431.216685 469.284839,389.350049 517.917216,369.122161 C656.772535,311.36743 685.625481,301.334815 704.431427,301.003532 C708.567621,300.93067 717.815839,301.955743 723.806446,306.816707 C728.864797,310.92121 730.256552,316.46581 730.922551,320.357329 C731.588551,324.248848 732.417879,333.113828 731.758626,340.040666 C724.234007,419.102486 691.675104,610.964674 675.110982,699.515267 C668.10208,736.984342 654.301336,749.547532 640.940618,750.777006 C611.904684,753.448938 589.856115,731.588035 561.733393,713.153237 C517.726886,684.306416 492.866009,666.349181 450.150074,638.200013 C400.78442,605.66878 432.786119,587.789048 460.919462,558.568563 C468.282091,550.921423 596.21508,434.556479 598.691227,424.000355 C599.00091,422.680135 599.288312,417.758981 596.36474,415.160431 C593.441168,412.561881 589.126229,413.450484 586.012448,414.157198 C581.598758,415.158943 511.297793,461.625274 375.109553,553.556189 C355.154858,567.258623 337.080515,573.934908 320.886524,573.585046 C303.033948,573.199351 268.692754,563.490928 243.163606,555.192408 C211.851067,545.013936 186.964484,539.632504 189.131547,522.346309 C190.260287,513.342589 202.659244,504.134509 226.328419,494.722069 Z"/></svg>
+      </a>
+      <a class="icon-link" href="https://c.realme.com/ru/user/__oEZr1EenR2ThtkVFx2d__/posts" target="_blank" rel="noopener" title="Я в сообществе realme" aria-label="Я в сообществе realme">
+        <svg viewBox="0 0 800 179.27956" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true"><path d="M88.315377 43.96599H0v131.92457h24.027339V68.007029h64.288038Z"/><path d="M432.17091 0h-24.02694v175.88956h24.02694Z"/><path d="M360.08509 43.96569v16.068559s-7.61598-10.181774-22.72394-15.68426c-7.09398-2.442594-14.68296-3.787391-22.59994-3.787391-38.29891 0-69.35183 31.053222-69.35183 69.351122 0 38.29891 31.05292 69.35183 69.35183 69.35183 7.91698 0 15.51996-1.345 22.59994-3.78699 15.10796-5.48899 22.70994-15.67096 22.72394-15.68496v16.06896h24.02694V43.96569Zm-45.32388 111.88992c-25.37194 0-45.94189-20.56895-45.94189-45.94189 0-25.371933 20.56995-45.941181 45.94189-45.941181 25.37193 0 45.94088 20.569248 45.94088 45.941181 0 25.37294-20.56895 45.94189-45.94088 45.94189Z"/><path d="M641.95238 71.43682c-7.69798-18.236454-24.65894-30.860722-46.11988-30.860722-18.22296 0-33.78392 9.125177-43.05989 23.025642-7.82198-13.914165-21.48895-23.025642-39.7259-23.025642-13.96897 0-25.00194 5.845585-32.80992 15.080562V43.97919h-24.02694v131.91037h24.02694V96.452757c0-6.106984.824-10.881972 2.31899-14.421963 4.48799-10.606974 14.98497-18.044855 27.21094-18.044855 12.22696 0 22.73794 7.437881 27.21093 18.044855 1.49599 3.539991 2.31899 8.314979 2.31899 14.421963v79.436803h24.02794V96.452757c0-6.106984.823-10.881972 2.31899-14.421963 4.48699-10.606974 14.98397-18.044855 27.21094-18.044855 12.22597 0 22.73694 7.437881 27.21093 18.044855 1.49599 3.539991 2.31899 8.314979 2.31899 14.421963v79.436803h24.02694v-75.66381c0-11.676973-1.57799-21.886947-4.48699-28.78893Z"/><path d="M212.68546 60.418748c-26.68993-26.469933-72.32981-26.469933-99.00475 0-26.47033 26.689033-26.47033 72.328922 0 99.004852 13.33797 13.22797 31.42292 19.85595 49.50888 19.85595 19.52695 0 39.0529-6.61398 53.46086-19.85595 4.10299-3.82799 7.58898-8.06898 10.49798-12.58297l-21.59895-12.47397c-1.92099 2.99199-4.22599 5.79099-6.94298 8.34298-9.55098 8.76898-22.47694 13.14597-35.40291 13.14597-11.97997 0-23.95894-4.37699-32.79592-13.14597-6.11998-6.16098-10.04497-13.87296-11.89697-22.02394h113.17972c3.15599-21.46095-3.115-44.266892-18.99196-60.266952ZM118.4967 99.16975c1.853-8.150979 5.77699-15.86296 11.89697-22.023944 17.67396-17.536656 47.90388-17.522956 65.57784 0 6.11998 6.174984 10.07197 13.872965 11.89697 22.023944Z"/><path d="M780.20303 60.418748c-26.68893-26.469933-72.32881-26.469933-99.00475 0-26.46993 26.689033-26.46993 72.328922 0 99.004852 13.33797 13.22797 31.42392 19.85595 49.50988 19.85595 19.52595 0 39.0529-6.61398 53.46086-19.85595 4.10299-3.82799 7.58798-8.06898 10.49698-12.58297l-21.59795-12.47397c-1.92099 2.99199-4.22699 5.79099-6.94398 8.34298-9.54998 8.76898-22.47594 13.14597-35.40291 13.14597-11.97897 0-23.95894-4.37699-32.79592-13.14597-6.11998-6.16098-10.04397-13.87296-11.89697-22.02394h113.17972c3.15699-21.46095-3.114-44.266892-18.99096-60.266952ZM686.01527 99.16975c1.852-8.150979 5.77699-15.86296 11.89697-22.023944 17.67396-17.536656 47.90388-17.522956 65.57784 0 6.11998 6.174984 10.07197 13.872965 11.89697 22.023944Z"/></svg>
+      </a>
+    </span>
   </nav>
+  <button id="themeBtn" title="Тема">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+  </button>
 </header>
 <!-- END HEADER SECTION -->
 
@@ -276,7 +312,11 @@ const PHOTOS = (window.PHOTOS || []).filter(Boolean);
 
 /* ---------- Тема: авто по времени суток; ручной выбор — до смены периода ---------- */
 const THEME_KEY = "theme-choice";
-const ICONS = {light:"☀", dark:"☾"};
+/* иконки солнца и луны — SVG одной высоты и одной толщины линии */
+const THEME_SVG = {
+  light:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
+  dark:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
 try{ localStorage.removeItem("theme-mode") }catch(e){} /* подчистить старый ключ от прежней логики */
 
 function period(){ const h=new Date().getHours(); return (h>=6&&h<18) ? "day" : "night"; }
@@ -291,7 +331,7 @@ function applyTheme(){
   document.documentElement.dataset.theme = t;
   const btn = document.getElementById("themeBtn");
   if(btn){
-    btn.textContent = ICONS[t];
+    btn.innerHTML = THEME_SVG[t];
     btn.title = choice()
       ? "Тема: выбрана вручную (действует до смены времени суток)"
       : "Тема: авто по времени суток (клик — сменить)";
@@ -304,6 +344,24 @@ document.getElementById("themeBtn").addEventListener("click",()=>{
 });
 applyTheme();
 setInterval(applyTheme, 60000); /* авто-тема и протухание выбора проверяются раз в минуту */
+
+/* ---------- Мобильная шапка: вторая строка сворачивается при прокрутке ---------- */
+const headerEl = document.getElementById("siteHeader");
+let headerCollapsed = false;
+function updateHeaderCollapse(){
+  if(!window.matchMedia("(max-width:640px)").matches){
+    if(headerCollapsed){ headerCollapsed=false; headerEl.classList.remove("collapsed"); }
+    return;
+  }
+  const c = window.scrollY > 72; /* вторая строка складывается, когда контент ушёл под шапку */
+  if(c !== headerCollapsed){
+    headerCollapsed = c;
+    headerEl.classList.toggle("collapsed", c);
+  }
+}
+window.addEventListener("scroll", updateHeaderCollapse, {passive:true});
+window.addEventListener("resize", updateHeaderCollapse);
+updateHeaderCollapse();
 
 /* ---------- Мозаика ---------- */
 const gallery = document.getElementById("mosaic");
