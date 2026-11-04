@@ -454,7 +454,10 @@ function step(d){ openLb((cur+d+order.length)%order.length); }
 document.getElementById("lbClose").addEventListener("click",closeLb);
 document.getElementById("lbPrev").addEventListener("click",()=>step(-1));
 document.getElementById("lbNext").addEventListener("click",()=>step(1));
-lb.addEventListener("click",e=>{ if(e.target===lb) closeLb(); });
+lb.addEventListener("click", e => {
+  if (e.target.closest("#lbImg, figcaption, .lb-btn")) return; /* фото, подпись, кнопки — не закрываем */
+  closeLb(); /* всё остальное: подложка, пустая фигура, зона над чипами — закрываем */
+});
 document.addEventListener("keydown",e=>{
   if(!lb.classList.contains("open")) return;
   if(e.key==="Escape") closeLb();
