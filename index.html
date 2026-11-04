@@ -342,7 +342,7 @@ async function exifFor(p){
   let e = null;
   try{
     if(typeof exifr !== "undefined"){
-      const d = await exifr.parse(p.src,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFilm","DigitalZoomRatio","DateTimeOriginal","CreateDate","ModifyDate"]});
+      const d = await exifr.parse(p.src,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFormat","DigitalZoomRatio","DateTimeOriginal","CreateDate","ModifyDate"]});
       if(d){
         e = {
           date: d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null,
@@ -351,7 +351,7 @@ async function exifFor(p){
           sh: fmtShutter(d.ExposureTime),
           iso: d.ISO ? ("ISO: "+d.ISO) : null,
           fl: d.FocalLength ? (Math.round(d.FocalLength)+" мм") : null,
-          fl35: d.FocalLengthIn35mmFilm && d.FocalLengthIn35mmFilm > 1 ? (Math.round(d.FocalLengthIn35mmFilm)+" мм") : null,
+          fl35: d.FocalLengthIn35mmFormat && d.FocalLengthIn35mmFormat > 1 ? (Math.round(d.FocalLengthIn35mmFormat)+" мм") : null,
           zoom: d.DigitalZoomRatio && d.DigitalZoomRatio>1 ? ("Зум ×"+d.DigitalZoomRatio.toFixed(1)) : null
         };
       }
