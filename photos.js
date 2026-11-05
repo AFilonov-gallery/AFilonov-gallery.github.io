@@ -87,6 +87,7 @@ window.PHOTOS = [
   {src:"photos/i-suck.JPG", title:"I suck"},
   {src:"photos/texture-snow.JPEG", title:"Снег"},
   {src:"photos/frost.JPEG", title:"Мороз"},
+  {src:"photos/handi-monkey.JPEG", title:"Handicapped punk monkey"},
   {src:"photos/dilema.JPEG", title:"Решала"},
   {src:"photos/soon.JPEG", title:"Soon"},
   {src:"photos/mist.JPEG", title:"Туман"},
