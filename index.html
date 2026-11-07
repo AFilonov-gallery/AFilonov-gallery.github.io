@@ -150,7 +150,7 @@
     border-radius:6px;box-shadow:0 24px 70px rgba(0,0,0,.55);
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   }
-  #lbImg{opacity:0;transition:opacity .25s}
+  #lbImg{opacity:0;transition:opacity .25s,transform .18s ease-out;transform-origin:0 0}
   #lbImg.ready{opacity:1}
   .lb-exif{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:80vw}
   .lb-exif .chip{
@@ -223,6 +223,11 @@
   /* подпись EXIF: гаснет и проявляется вместе с кадром */
   #lb figcaption{opacity:0;transition:opacity .3s ease}
   #lb figcaption.show{opacity:1}
+  /* зум: курсоры и гашение анимации на время перетаскивания */
+  #lb figure{cursor:zoom-in}
+  #lb.zoomed{cursor:grab}
+  #lb.dragging{cursor:grabbing}
+  #lb.dragging #lbImg{transition:opacity .25s}
 </style>
 </head>
 <body>
@@ -466,6 +471,7 @@ function openLb(pos){
   cur = pos;
   const o = PHOTOS[pos];
   if(!o) return;
+  zoomReset();
   const thumb = o.thumb
     || (o.src.indexOf("photos/") === 0 ? "photos/small/" + o.src.slice(7) : null);
   const wasOpen = lb.classList.contains("open");
@@ -588,7 +594,8 @@ document.getElementById("lbClose").addEventListener("click",()=>closeLb());
 document.getElementById("lbPrev").addEventListener("click",()=>step(-1));
 document.getElementById("lbNext").addEventListener("click",()=>step(1));
 lb.addEventListener("click", e => {
-  if (e.target.closest(".lb-btn, figcaption")) return; /* кнопки и подпись — не закрываем */
+  if (e.target.closest(".lb-btn, figcaption")) return;
+  if (zScale > 1 || suppressClick) return; /* увеличено или это был drag — не закрываем */
   closeLb(); /* всё остальное, включая само фото, — закрываем */
 });
 document.addEventListener("keydown",e=>{
@@ -596,6 +603,76 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape") closeLb();
   if(e.key==="ArrowLeft") step(-1);
   if(e.key==="ArrowRight") step(1);
+});
+
+/* ---------- Зум колёсиком ---------- */
+let zScale = 1, zx = 0, zy = 0;
+let dragRef = null, dragged = false, suppressClick = false;
+
+function applyZoom(){
+  lbImg.style.transform = "translate("+zx+"px,"+zy+"px) scale("+zScale+")";
+  lb.classList.toggle("zoomed", zScale > 1);
+}
+function zoomReset(){
+  zScale = 1; zx = 0; zy = 0;
+  lbImg.style.transform = "";
+  lb.classList.remove("zoomed","dragging");
+}
+function zoomAt(cx, cy, target){
+  const r = lbImg.getBoundingClientRect();
+  if(!r.width) return;
+  const ns = Math.min(5, Math.max(1, target));
+  const lx = r.left - zx, ly = r.top - zy; /* позиция кадра без трансформации */
+  const ratio = ns / zScale;
+  if(ns === 1){ zx = 0; zy = 0; }
+  else{
+    /* точка под курсором остаётся под курсором */
+    zx = cx - lx - (cx - lx - zx) * ratio;
+    zy = cy - ly - (cy - ly - zy) * ratio;
+    /* не даём утащить кадр за экран: перекрытие минимум 80px */
+    const W = lbImg.offsetWidth * ns, H = lbImg.offsetHeight * ns;
+    zx = Math.min(window.innerWidth  - 80 - lx, Math.max(80 - lx - W, zx));
+    zy = Math.min(window.innerHeight - 80 - ly, Math.max(80 - ly - H, zy));
+  }
+  zScale = ns;
+  applyZoom();
+}
+lb.addEventListener("wheel", e=>{
+  if(!lb.classList.contains("open")) return;
+  e.preventDefault();
+  if(zScale === 1 && e.deltaY > 0) return; /* уже минимум — не дёргаемся */
+  /* экспонента вместо фиксированного шага: плавно и для колеса, и для тачпада */
+  zoomAt(e.clientX, e.clientY, zScale * Math.exp(-e.deltaY * 0.0018));
+}, {passive:false});
+
+/* перетаскивание увеличенного кадра */
+lb.addEventListener("mousedown", e=>{
+  if(!lb.classList.contains("open") || zScale === 1) return;
+  if(e.target.closest(".lb-btn")) return;
+  dragRef = {x:e.clientX, y:e.clientY, zx, zy};
+  dragged = false;
+  lb.classList.add("dragging");
+  e.preventDefault();
+});
+addEventListener("mousemove", e=>{
+  if(!dragRef) return;
+  const dx = e.clientX - dragRef.x, dy = e.clientY - dragRef.y;
+  if(Math.abs(dx) > 4 || Math.abs(dy) > 4) dragged = true;
+  zx = dragRef.zx + dx; zy = dragRef.zy + dy;
+  applyZoom();
+});
+addEventListener("mouseup", ()=>{
+  if(!dragRef) return;
+  dragRef = null;
+  lb.classList.remove("dragging");
+  if(dragged){ suppressClick = true; setTimeout(()=>suppressClick = false, 0); }
+});
+
+/* двойной клик: увеличить в точке / вернуть как было */
+lb.addEventListener("dblclick", e=>{
+  if(!lb.classList.contains("open") || e.target.closest(".lb-btn")) return;
+  if(zScale > 1) zoomReset();
+  else zoomAt(e.clientX, e.clientY, 2.5);
 });
 
 /* ---------- Свайпы в лайтбоксе (смартфоны) ---------- */
