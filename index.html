@@ -224,7 +224,6 @@
   #lb figcaption{opacity:0;transition:opacity .3s ease}
   #lb figcaption.show{opacity:1}
   /* зум: курсоры и гашение анимации на время перетаскивания */
-  #lb figure{cursor:zoom-in}
   #lb.zoomed{cursor:grab}
   #lb.dragging{cursor:grabbing}
   #lb.dragging #lbImg{transition:opacity .25s}
@@ -668,11 +667,10 @@ addEventListener("mouseup", ()=>{
   if(dragged){ suppressClick = true; setTimeout(()=>suppressClick = false, 0); }
 });
 
-/* двойной клик: увеличить в точке / вернуть как было */
+/* двойной клик по увеличенному кадру — возврат к 1:1 */
 lb.addEventListener("dblclick", e=>{
   if(!lb.classList.contains("open") || e.target.closest(".lb-btn")) return;
   if(zScale > 1) zoomReset();
-  else zoomAt(e.clientX, e.clientY, 2.5);
 });
 
 /* ---------- Свайпы в лайтбоксе (смартфоны) ---------- */
