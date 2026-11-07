@@ -38,6 +38,7 @@ window.PHOTOS = [
   {src:"photos/goodwill-2.JPG", title:"Goodwill 2"},
   {src:"photos/time.jpg", title:"Time"},
   {src:"photos/sunset.JPG", title:"Sunset"},
+  {src:"photos/night-block.jpg", title:"Night block"},
   {src:"photos/undersize.JPG", title:"Undersize"},
   {src:"photos/beware-of-the-bird.JPG", title:"Beware of the bird"},
   {src:"photos/fan-id.JPG", title:"Fan id"},
