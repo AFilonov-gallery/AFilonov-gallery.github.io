@@ -377,6 +377,7 @@ const lbCount = document.getElementById("lbCount");
 const lbBar = document.getElementById("lbBar");
 const lbFill = document.getElementById("lbFill");
 let cur = 0;
+let lbStatePushed = false; /* висит ли виртуальная запись истории для лайтбокса */
 let loadCtl = null;       /* отменяемая загрузка оригинала */
 let lastBlobUrl = null;   /* blob-URL предыдущего оригинала, освобождаем при замене */
 const exifCache = new Map();
@@ -516,6 +517,12 @@ function openLb(pos){
   lb.classList.add("open");
   document.body.style.overflow = "hidden";
   document.documentElement.style.overflow = "hidden";
+    /* ловушка истории: одна виртуальная запись на всё открытие лайтбокса,
+     чтобы «назад» (жест от края, кнопка) закрывал фото, а не страницу */
+  if(!lbStatePushed){
+    history.pushState({lb:true}, "", location.href);
+    lbStatePushed = true;
+  }
   exifFor(o).then(e=>{
     if(cur !== pos) return; /* пока читали EXIF, ушли к другому кадру */
     const has = renderExif(e, e && e.date ? fmtDate(e.date) : null);
@@ -561,14 +568,23 @@ function openLb(pos){
     if(full.complete) swap(); else full.onload = swap;
   });
 }
-function closeLb(){
+function closeLb(fromPop){
   lb.classList.remove("open");
   document.body.style.overflow = "";
   document.documentElement.style.overflow = "";
+  /* убираем виртуальную запись, если закрываем не жестом «назад» */
+  if(lbStatePushed && !fromPop){
+    lbStatePushed = false;
+    history.back();
+  }
 }
+addEventListener("popstate", () => {
+  /* вернулись по истории: если лайтбокс открыт — закрываем молча */
+  if(lb.classList.contains("open")) closeLb(true);
+});
 function step(d){ openLb((cur+d+PHOTOS.length)%PHOTOS.length); }
 
-document.getElementById("lbClose").addEventListener("click",closeLb);
+document.getElementById("lbClose").addEventListener("click",()=>closeLb());
 document.getElementById("lbPrev").addEventListener("click",()=>step(-1));
 document.getElementById("lbNext").addEventListener("click",()=>step(1));
 lb.addEventListener("click", e => {
