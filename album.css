@@ -121,7 +121,7 @@ body.lb-open{overflow:hidden}
   position:relative;
   z-index:1;
   background:var(--mat);
-  padding:10px 10px 14px;
+  padding:10px 10px 48px;
   box-shadow:0 4px 16px rgba(0,0,0,.55), 0 1px 3px rgba(0,0,0,.4);
   transition:transform .17s ease, box-shadow .17s ease;
   cursor:pointer;
@@ -146,14 +146,14 @@ body.lb-open{overflow:hidden}
 .corner.c3{bottom:-9px;left:-9px;clip-path:polygon(0 0,0 100%,100% 100%)}
 .corner.c4{bottom:-9px;right:-9px;clip-path:polygon(100% 0,100% 100%,0 100%)}
 
-/* подпись: дата съёмки, рукописным */
+/* подпись: дата съёмки рукописью, на «подбородке» самой карточки */
 .cap{
+  position:absolute; left:0; right:0; bottom:6px;
   font-family:'Marck Script',cursive;
-  font-size:1.12rem;
-  color:#cfc9bb;
-  margin-top:9px;
-  min-height:1.4em;
-  text-align:center;
+  font-size:1.08rem;
+  color:#6b5d49;                       /* чернила на светлой бумаге паспарту */
+  text-align:center; line-height:1.2;
+  pointer-events:none;
 }
 
 /* номер страницы */
@@ -307,7 +307,8 @@ body.lb-open{overflow:hidden}
     background:linear-gradient(180deg,transparent,rgba(0,0,0,.5),transparent)}
   .page{width:100%;height:50%;padding:22px 16px;box-shadow:none!important}
   .print img{max-height:calc(50vh - 92px)}
-  .cap{font-size:1rem;margin-top:6px}
+  .print{padding-bottom:40px}
+  .cap{font-size:.92rem;bottom:4px}
   .nav-btn{display:none}
   #ribbon{right:26px}
   .lb-nav{display:none}
