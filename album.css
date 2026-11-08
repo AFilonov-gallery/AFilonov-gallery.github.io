@@ -113,16 +113,19 @@ body.lb-open{overflow:hidden}
 
 /* отпечаток */
 .card{max-width:100%; max-height:100%}
+.pwrap{
+  position:relative;
+  transform:rotate(var(--tilt,0deg));
+}
 .print{
   position:relative;
   background:var(--mat);
   padding:10px 10px 14px;
   box-shadow:0 4px 16px rgba(0,0,0,.55), 0 1px 3px rgba(0,0,0,.4);
-  transform:rotate(var(--tilt,0deg));
   transition:transform .17s ease, box-shadow .17s ease;
   cursor:pointer;
 }
-.card:hover .print{transform:rotate(0deg) translateY(-5px)}
+.card:hover .print{transform:rotate(0deg) translateY(-4px) scale(1.025)}
 .card.lifting .print{transform:translateY(-12px) scale(1.035) rotate(0deg)}
 .print img{
   display:block;
@@ -198,14 +201,26 @@ body.lb-open{overflow:hidden}
 .nav-btn.next{right:16px}
 
 /* ============ Лента-закладка ============ */
+/* Контейнер только держит позицию и растущую высоту; полотно и хвост — псевдоэлементы,
+   чтобы хвост не растягивался вместе с лентой. Полотно заходит под хвост на 4px
+   (вырез хвоста начинается на 7.7px ниже его верха, так что наложение всегда скрыто). */
 #ribbon{
   position:fixed; top:0; right:88px; width:24px; z-index:39;
   height:12%;
-  background:linear-gradient(180deg,#c39a4b,#9d7a33);
-  clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);
-  box-shadow:0 2px 6px rgba(0,0,0,.5);
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
   transition:height .5s ease;
   pointer-events:none;
+}
+#ribbon::before{                      /* полотно ленты */
+  content:""; position:absolute; left:0; right:0; top:0;
+  height:calc(100% - 10px);           /* 4px перекрытия — убивает шов от округления */
+  background:linear-gradient(180deg,#c39a4b,#9d7a33);
+}
+#ribbon::after{                       /* хвост с V-вырезом, фиксированной высоты */
+  content:""; position:absolute; left:0; right:0; top:calc(100% - 14px);
+  height:14px;
+  background:linear-gradient(180deg,#9d7a33,#8a6a2b);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 55%,0 100%);
 }
 
 /* ============ Лайтбокс ============ */
