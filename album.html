@@ -87,6 +87,16 @@ function fmtShutter(t){
    бывают 9 МБ), а первые 256 КБ потоком и обрываем загрузку. Кэш общий: дата на
    развороте и полоска в лайтбоксе берутся из одного запроса. */
 const exifCache = new Map();
+/* exifr подключён с defer и исполняется позже инлайн-скрипта:
+   дожидаемся библиотеку, прежде чем первый вызов exifFor не закэширует null */
+const exifrReady = new Promise(res=>{
+  if(typeof exifr !== "undefined") return res();
+  let n = 0;
+  const iv = setInterval(()=>{
+    if(typeof exifr !== "undefined"){ clearInterval(iv); res(); }
+    else if(++n > 200){ clearInterval(iv); res(); } /* ~20 сек: CDN недоступен — работаем без EXIF */
+  }, 100);
+});
 const EXIF_HEAD = 262144; /* 256 КБ — запас на развёрнутый EXIF с GPS и превью */
 
 async function readHead(url){
@@ -112,6 +122,7 @@ async function exifFor(p){
   const src = (typeof p === "string") ? p : p.src;
   if(typeof p === "object" && p && p.exif) return p.exif;
   if(exifCache.has(src)) return exifCache.get(src);
+  await exifrReady; /* библиотека могла ещё грузиться — ждём её */
   let e = null;
   try{
     if(typeof exifr !== "undefined"){
