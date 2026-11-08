@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Алексей Филонов — альбом</title>
+<meta name="description" content="Художественные фотографии, снятые на мобильный телефон.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marck+Script&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/exifr@7/dist/full.umd.js"></script>
+<link rel="stylesheet" href="album.css">
+</head>
+<body>
+
+<!-- ======== ОБЛОЖКА ======== -->
+<div id="track">
+  <section class="sheet">
+    <div class="cover">
+      <div class="cover-inner">
+        <div class="emboss">Алексей <em>Филонов</em></div>
+        <div class="cover-sub" id="yearsLine">Фотографии · 2013–2026</div>
+        <button id="openAlbum" disabled>ОТКРЫТЬ АЛЬБОМ</button>
+      </div>
+      <span class="elastic"></span>
+      <div class="cover-foot">
+        <a href="https://c.realme.com/ru/user/__oEZr1EenR2ThtkVFx2d__/posts" target="_blank" rel="noopener" title="Я в сообществе realme" aria-label="Я в сообществе realme">
+          <svg viewBox="0 0 800 179.27956" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true"><path d="M88.315377 43.96599H0v131.92457h24.027339V68.007029h64.288038Z"/><path d="M432.17091 0h-24.02694v175.88956h24.02694Z"/><path d="M360.08509 43.96569v16.068559s-7.61598-10.181774-22.72394-15.68426c-7.09398-2.442594-14.68296-3.787391-22.59994-3.787391-38.29891 0-69.35183 31.053222-69.35183 69.351122 0 38.29891 31.05292 69.35183 69.35183 69.35183 7.91698 0 15.51996-1.345 22.59994-3.78699 15.10796-5.48899 22.70994-15.67096 22.72394-15.68496v16.06896h24.02694V43.96569Zm-45.32388 111.88992c-25.37194 0-45.94189-20.56895-45.94189-45.94189 0-25.371933 20.56995-45.941181 45.94189-45.941181 25.37193 0 45.94088 20.569248 45.94088 45.941181 0 25.37294-20.56895 45.94189-45.94088 45.94189Z"/><path d="M641.95238 71.43682c-7.69798-18.236454-24.65894-30.860722-46.11988-30.860722-18.22296 0-33.78392 9.125177-43.05989 23.025642-7.82198-13.914165-21.48895-23.025642-39.7259-23.025642-13.96897 0-25.00194 5.845585-32.80992 15.080562V43.97919h-24.02694v131.91037h24.02694V96.452757c0-6.106984.824-10.881972 2.31899-14.421963 4.48799-10.606974 14.98497-18.044855 27.21094-18.044855 12.22696 0 22.73794 7.437881 27.21093 18.044855 1.49599 3.539991 2.31899 8.314979 2.31899 14.421963v79.436803h24.02794V96.452757c0-6.106984.823-10.881972 2.31899-14.421963 4.48699-10.606974 14.98397-18.044855 27.21094-18.044855 12.22597 0 22.73694 7.437881 27.21093 18.044855 1.49599 3.539991 2.31899 8.314979 2.31899 14.421963v79.436803h24.02694v-75.66381c0-11.676973-1.57799-21.886947-4.48699-28.78893Z"/><path d="M212.68546 60.418748c-26.68993-26.469933-72.32981-26.469933-99.00475 0-26.47033 26.689033-26.47033 72.328922 0 99.004852 13.33797 13.22797 31.42292 19.85595 49.50888 19.85595 19.52695 0 39.0529-6.61398 53.46086-19.85595 4.10299-3.82799 7.58898-8.06898 10.49798-12.58297l-21.59895-12.47397c-1.92099 2.99199-4.22599 5.79099-6.94298 8.34298-9.55098 8.76898-22.47694 13.14597-35.40291 13.14597-11.97997 0-23.95894-4.37699-32.79592-13.14597-6.11998-6.16098-10.04497-13.87296-11.89697-22.02394h113.17972c3.15599-21.46095-3.115-44.266892-18.99196-60.266952ZM118.4967 99.16975c1.853-8.150979 5.77699-15.86296 11.89697-22.023944 17.67396-17.536656 47.90388-17.522956 65.57784 0 6.11998 6.174984 10.07197 13.872965 11.89697 22.023944Z"/><path d="M780.20303 60.418748c-26.68893-26.469933-72.32881-26.469933-99.00475 0-26.46993 26.689033-26.46993 72.328922 0 99.004852 13.33797 13.22797 31.42392 19.85595 49.50988 19.85595 19.52595 0 39.0529-6.61398 53.46086-19.85595 4.10299-3.82799 7.58798-8.06898 10.49698-12.58297l-21.59795-12.47397c-1.92099 2.99199-4.22699 5.79099-6.94398 8.34298-9.54998 8.76898-22.47594 13.14597-35.40291 13.14597-11.97897 0-23.95894-4.37699-32.79592-13.14597-6.11998-6.16098-10.04397-13.87296-11.89697-22.02394h113.17972c3.15699-21.46095-3.114-44.266892-18.99096-60.266952ZM686.01527 99.16975c1.852-8.150979 5.77699-15.86296 11.89697-22.023944 17.67396-17.536656 47.90388-17.522956 65.57784 0 6.11998 6.174984 10.07197 13.872965 11.89697 22.023944Z"/></svg>
+        </a>
+        <a href="https://t.me/idea_generator" target="_blank" rel="noopener" title="Я в Telegram" aria-label="Я в Telegram">
+          <svg viewBox="185 297 551 458" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true"><path d="M226.328419,494.722069 C372.088573,431.216685 469.284839,389.350049 517.917216,369.122161 C656.772535,311.36743 685.625481,301.334815 704.431427,301.003532 C708.567621,300.93067 717.815839,301.955743 723.806446,306.816707 C728.864797,310.92121 730.256552,316.46581 730.922551,320.357329 C731.588551,324.248848 732.417879,333.113828 731.758626,340.040666 C724.234007,419.102486 691.675104,610.964674 675.110982,699.515267 C668.10208,736.984342 654.301336,749.547532 640.940618,750.777006 C611.904684,753.448938 589.856115,731.588035 561.733393,713.153237 C517.726886,684.306416 492.866009,666.349181 450.150074,638.200013 C400.78442,605.66878 432.786119,587.789048 460.919462,558.568563 C468.282091,550.921423 596.21508,434.556479 598.691227,424.000355 C599.00091,422.680135 599.288312,417.758981 596.36474,415.160431 C593.441168,412.561881 589.126229,413.450484 586.012448,414.157198 C581.598758,415.158943 511.297793,461.625274 375.109553,553.556189 C355.154858,567.258623 337.080515,573.934908 320.886524,573.585046 C303.033948,573.199351 268.692754,563.490928 243.163606,555.192408 C211.851067,545.013936 186.964484,539.632504 189.131547,522.346309 C190.260287,513.342589 202.659244,504.134509 226.328419,494.722069 Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ======== СТРЕЛКИ ======== -->
+<button class="nav-btn prev" id="navPrev" aria-label="Предыдущий разворот">&#8592;</button>
+<button class="nav-btn next" id="navNext" aria-label="Следующий разворот">&#8594;</button>
+
+<!-- ======== ЛЕНТА-ЗАКЛАДКА ======== -->
+<div id="ribbon"></div>
+
+<!-- ======== ЛАЙТБОКС ======== -->
+<div id="lb" role="dialog" aria-modal="true">
+  <button class="lb-btn lb-x" id="lbClose" aria-label="Закрыть">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <button class="lb-btn lb-nav prev" id="lbPrev" aria-label="Назад">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="lb-btn lb-nav next" id="lbNext" aria-label="Вперёд">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <figure>
+    <img id="lbImg" alt="" draggable="false">
+    <div id="lbBar"><div id="lbFill"></div></div>
+    <figcaption>
+      <div class="lb-exif" id="lbExif"></div>
+    </figcaption>
+  </figure>
+  <div class="lb-count" id="lbCount"></div>
+</div>
+
+<script src="photos.js"></script>
+<script>
+const PHOTOS = (window.PHOTOS || []).filter(Boolean);
+const CUR_YEAR = new Date().getFullYear();
+
+/* ---------- Мелкие утилиты ---------- */
+function thumbOf(p){
+  return p.thumb || (p.src.indexOf("photos/") === 0 ? "photos/small/" + p.src.slice(7) : p.src);
+}
+function fmtDate(d){
+  if(!d || !(d instanceof Date)) return null;
+  return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"});
+}
+function fmtShutter(t){
+  if(!t) return null;
+  return t >= 1 ? t.toFixed(1).replace(".0","")+" с" : "1/"+Math.round(1/t);
+}
+
+/* exifr подключён с defer — дожидаемся его перед первым разбором */
+const exifrReady = new Promise(res=>{
+  if(typeof exifr !== "undefined") return res();
+  addEventListener("load", ()=>res(), {once:true});
+});
+
+/* ---------- EXIF (общий кэш по адресу файла) ---------- */
+const exifCache = new Map();
+
+/* читаем только начало файла: EXIF живёт в первых килобайтах JPEG,
+   поэтому качаем не оригинал целиком, а максимум LIMIT байт */
+async function readHead(src, LIMIT){
+  LIMIT = LIMIT || 262144; /* 256 КБ */
+  const res = await fetch(src);
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  if(!res.body){
+    const b = await res.blob();
+    return b.slice(0, LIMIT).arrayBuffer ? await b.slice(0, LIMIT).arrayBuffer() : b.slice(0, LIMIT);
+  }
+  const reader = res.body.getReader();
+  const chunks = [];
+  let got = 0;
+  try{
+    while(got < LIMIT){
+      const r = await reader.read();
+      if(r.done) break;
+      chunks.push(r.value);
+      got += r.value.length;
+    }
+  }finally{
+    try{ reader.cancel(); }catch(e){}
+  }
+  return new Blob(chunks).arrayBuffer();
+}
+async function exifFor(p){
+  const src = (typeof p === "string") ? p : p.src;
+  if(typeof p === "object" && p && p.exif) return p.exif;
+  if(exifCache.has(src)) return exifCache.get(src);
+  let e = null;
+  try{
+    await exifrReady;              /* не разбираем, пока библиотека не пришла */
+    if(typeof exifr !== "undefined"){
+      const buf = await readHead(src);   /* оригинал, только начало */
+      if(buf){
+        const d = await exifr.parse(buf,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFormat","DigitalZoomRatio","DateTimeOriginal","CreateDate","ModifyDate"]});
+        if(d){
+          e = {
+            date: d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null,
+            cam: d.Model || null,
+            ap: d.FNumber ? ("f/"+(Number.isInteger(d.FNumber)?d.FNumber:d.FNumber.toFixed(1))) : null,
+            sh: fmtShutter(d.ExposureTime),
+            iso: d.ISO ? ("ISO: "+d.ISO) : null,
+            fl: d.FocalLength ? (Math.round(d.FocalLength)+" мм") : null,
+            fl35: d.FocalLengthIn35mmFormat && d.FocalLengthIn35mmFormat > 1 ? (Math.round(d.FocalLengthIn35mmFormat)+" мм") : null,
+            zoom: d.DigitalZoomRatio && d.DigitalZoomRatio > 1 ? ("Зум ×"+d.DigitalZoomRatio.toFixed(1)) : null
+          };
+        }
+      }
+    }
+  }catch(err){ /* нет EXIF, файл недоступен или fetch запрещён */ }
+  if(typeof exifr !== "undefined") exifCache.set(src, e);
+  return e;
+}
+
+/* ---------- Годы на обложке: из EXIF первой и последней фотографии ---------- */
+let yearsSet = false;
+(async function setYears(){
+  if(yearsSet || !PHOTOS.length) return;
+  const a = await exifFor(PHOTOS[0]);
+  const b = await exifFor(PHOTOS[PHOTOS.length-1]);
+  const ya = a && a.date ? a.date.getFullYear() : null;
+  const yb = b && b.date ? b.date.getFullYear() : null;
+  if(ya && yb){
+    yearsSet = true;
+    document.getElementById("yearsLine").textContent =
+      "Фотографии · " + Math.min(ya,yb) + "\u2013" + Math.max(ya,yb);
+  }
+})();
+
+/* ---------- Пропорции тамбов → группировка разворотов ---------- */
+const dims = new Array(PHOTOS.length).fill(0);
+let dimsDone = 0;
+let spreads = null;
+let dimsLoaded = false;
+
+PHOTOS.forEach((p,i)=>{
+  const im = new Image();
+  im.onload = im.onerror = ()=>{
+    dims[i] = im.naturalWidth && im.naturalHeight ? im.naturalWidth/im.naturalHeight : 1;
+    dimsDone++;
+    if(dimsDone === PHOTOS.length && !dimsLoaded){
+      dimsLoaded = true;
+      buildAll();
+    }
+  };
+  im.src = thumbOf(p);
+});
+
+function buildSpreads(){
+  const out = [];
+  const pend = [];
+  const flush = ()=>{
+    while(pend.length){
+      if(pend.length >= 2) out.push([pend.shift(), pend.shift()]);
+      else out.push([pend.shift()]);
+    }
+  };
+  PHOTOS.forEach((_,i)=>{
+    const r = dims[i] || 1;
+    if(r > 1.6){ flush(); out.push([i]); }
+    else{
+      pend.push(i);
+      if(pend.length === 2) out.push([pend.shift(), pend.shift()]);
+    }
+  });
+  flush();
+  return out;
+}
+
+/* ---------- Сборка разворотов (ленивая) ---------- */
+const track = document.getElementById("track");
+const built = new Set();
+
+function cardPhoto(idx){
+  const p = PHOTOS[idx];
+  const card = document.createElement("div");
+  card.className = "card";
+  card.style.setProperty("--tilt", (((idx*137)%9-4)/2) + "deg");
+  const pr = document.createElement("div");
+  pr.className = "print";
+  const img = document.createElement("img");
+  img.src = thumbOf(p);
+  img.alt = "";
+  img.loading = "lazy";
+  img.draggable = false;
+  pr.appendChild(img);
+  for(let k=1;k<=4;k++){
+    const c = document.createElement("span");
+    c.className = "corner c"+k;
+    pr.appendChild(c);
+  }
+  card.appendChild(pr);
+  const cap = document.createElement("div");
+  cap.className = "cap";
+  card.appendChild(cap);
+  /* подпись = дата съёмки (EXIF читаем из начала оригинала) */
+  exifFor(p).then(e=>{
+    const d = e && e.date ? fmtDate(e.date) : null;
+    if(d) cap.textContent = d;
+  });
+  /* клик: «вынимание из уголков» и лайтбокс */
+  card.addEventListener("click", ()=>{
+    if(animLock) return;
+    card.classList.add("lifting");
+    setTimeout(()=>{ openLb(idx); card.classList.remove("lifting"); }, 170);
+  });
+  return card;
+}
+
+function buildSheet(si){
+  if(built.has(si) || !spreads) return;
+  const group = spreads[si];
+  const sheet = document.createElement("section");
+  sheet.className = "sheet";
+  const pages = document.createElement("div");
+  pages.className = "pages";
+  group.forEach((idx,k)=>{
+    const pg = document.createElement("div");
+    pg.className = "page " + (k===0 ? "left" : "right");
+    pg.appendChild(cardPhoto(idx));
+    pages.appendChild(pg);
+  });
+  const num = document.createElement("div");
+  num.className = "pagenum";
+  num.textContent = "\u2014 " + (si+1) + " \u2014";
+  sheet.appendChild(pages);
+  sheet.appendChild(num);
+  attachZones(sheet);
+  track.appendChild(sheet);
+  built.add(si);
+}
+
+function buildAbout(si){
+  if(built.has(si) || !spreads) return;
+  const sheet = document.createElement("section");
+  sheet.className = "sheet aboutpage";
+  const pages = document.createElement("div");
+  pages.className = "pages";
+  const pg = document.createElement("div");
+  pg.className = "page";
+  const inner = document.createElement("div");
+  inner.className = "about-inner";
+  inner.innerHTML =
+    '<span class="tape"></span>' +
+    '<h2>Обо мне</h2>' +
+    '<p>\u00abЛучшая камера \u2014 та, которая у тебя с собой\u00bb (с) Чейз Джарвис.</p>' +
+    '<p>Убежден, что дело не в технике, а часто даже наоборот: хороший кадр \u2014 это способ передать взгляд автора и настроение в моменте.</p>' +
+    '<p>Кадры здесь не ранжированы никак, кроме хронологии, и не отобраны для выставки или для победы на фотоконкурсе. Это живая лента того, что я замечаю, и чем решил поделиться.</p>' +
+    '<div class="about-foot"><a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ru" target="_blank" rel="noopener">CC BY-NC 4.0</a> \u00b7 2026</div>';
+  pg.appendChild(inner);
+  pages.appendChild(pg);
+  const num = document.createElement("div");
+  num.className = "pagenum";
+  num.textContent = "\u2014 " + (si+1) + " \u2014";
+  sheet.appendChild(pages);
+  sheet.appendChild(num);
+  attachZones(sheet);
+  track.appendChild(sheet);
+  built.add(si);
+}
+
+/* клики по левой/правой трети страницы листают, клик по фото — нет */
+function attachZones(sheet){
+  sheet.addEventListener("click", e=>{
+    if(e.target.closest(".card, .cap")) return;
+    const w = window.innerWidth;
+    if(e.clientX < w*0.33) nav(-1);
+    else if(e.clientX > w*0.66) nav(1);
+  });
+}
+
+function buildAll(){
+  spreads = buildSpreads();
+  buildSheet(0);
+  if(spreads.length > 1) buildSheet(1);
+  document.getElementById("openAlbum").disabled = false;
+  updateRibbon(); updateArrows();
+}
+
+/* ---------- Навигация по книге ---------- */
+let cur = 0, animLock = false;
+const totalSheets = ()=> spreads ? spreads.length + 1 : 1;
+
+function ensure(i){
+  if(!spreads) return;
+  buildSheet(i);
+  if(i+1 === spreads.length) buildAbout(spreads.length);
+  else buildSheet(i+1);
+}
+function go(i){
+  if(!spreads) return;
+  const tot = totalSheets();
+  i = Math.max(0, Math.min(tot-1, i));
+  ensure(i);
+  if(i === cur) { updateRibbon(); updateArrows(); return; }
+  cur = i;
+  animLock = true;
+  track.style.transform = "translateX(" + (i * -100) + "vw)";
+  updateRibbon(); updateArrows();
+  setTimeout(()=>{ animLock = false; }, 660);
+}
+function nav(d){ go(cur + d); }
+
+function updateRibbon(){
+  const tot = totalSheets();
+  const pct = Math.max(8, Math.round((cur+1)/tot*100));
+  document.getElementById("ribbon").style.height = pct + "%";
+}
+function updateArrows(){
+  const p = document.getElementById("navPrev");
+  const n = document.getElementById("navNext");
+  p.classList.toggle("show", cur > 0);
+  n.classList.toggle("show", cur < totalSheets()-1);
+}
+document.getElementById("navPrev").addEventListener("click", ()=>nav(-1));
+document.getElementById("navNext").addEventListener("click", ()=>nav(1));
+document.getElementById("openAlbum").addEventListener("click", ()=>go(1));
+
+/* колесо/тачпад: один разворот за раз */
+let wheelLock = 0;
+addEventListener("wheel", e=>{
+  if(lb.classList.contains("open") || !spreads) return;
+  const now = Date.now();
+  if(now < wheelLock || Math.abs(e.deltaY) < 8) return;
+  if(e.deltaY > 0 && cur < totalSheets()-1){ wheelLock = now + 650; nav(1); }
+  else if(e.deltaY < 0 && cur > 0){ wheelLock = now + 650; nav(-1); }
+},{passive:true});
+
+/* клавиатура */
+document.addEventListener("keydown", e=>{
+  if(lb.classList.contains("open")){
+    if(e.key === "Escape") closeLb();
+    if(e.key === "ArrowLeft") step(-1);
+    if(e.key === "ArrowRight") step(1);
+    return;
+  }
+  if(!spreads) return;
+  if(e.key === "ArrowRight" || e.key === "PageDown") nav(1);
+  if(e.key === "ArrowLeft" || e.key === "PageUp") nav(-1);
+  if(e.key === "Home") go(0);
+  if(e.key === "End") go(totalSheets()-1);
+});
+
+/* свайпы по книге (не у краёв: там живёт системный жест «назад») */
+(function(){
+  const EDGE = 24, MIN_DX = 60;
+  let sx = 0, sy = 0, active = false;
+  track.addEventListener("touchstart", e=>{
+    if(lb.classList.contains("open") || !spreads) return;
+    if(e.touches.length !== 1) return;
+    const x = e.touches[0].clientX;
+    if(x < EDGE || x > window.innerWidth - EDGE) return;
+    sx = x; sy = e.touches[0].clientY; active = true;
+  },{passive:true});
+  track.addEventListener("touchend", e=>{
+    if(!active) return;
+    active = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Math.abs(dx) > MIN_DX && Math.abs(dx) > Math.abs(dy)*1.5){
+      dx < 0 ? nav(1) : nav(-1);
+    }
+  },{passive:true});
+  track.addEventListener("touchcancel", ()=>{ active = false; },{passive:true});
+})();
+
+/* ---------- Запрет контекстного меню и перетаскивания ---------- */
+document.addEventListener("contextmenu", e=>{
+  if(e.target.tagName === "IMG" || (e.target.closest && e.target.closest("#lb"))) e.preventDefault();
+});
+document.addEventListener("dragstart", e=>{ if(e.target.tagName === "IMG") e.preventDefault(); });
+
+/* ---------- Лайтбокс ---------- */
+const lb = document.getElementById("lb");
+const lbImg = document.getElementById("lbImg");
+const lbExif = document.getElementById("lbExif");
+const lbCount = document.getElementById("lbCount");
+const lbBar = document.getElementById("lbBar");
+const lbFill = document.getElementById("lbFill");
+let lbCur = 0;
+let lbStatePushed = false;
+let loadCtl = null;
+let lastBlobUrl = null;
+let lastCard = null;
+
+/* EXIF в лайтбоксе: одна полоска бумаги, печатная машинка */
+function renderExif(e, dateStr){
+  const parts = [];
+  if(dateStr) parts.push(dateStr);
+  if(e && e.cam) parts.push(e.cam);
+  if(e && e.fl35) parts.push("ЭФР " + e.fl35);
+  else if(e && e.fl) parts.push(e.fl);
+  if(e && e.ap) parts.push(e.ap);
+  if(e && e.sh) parts.push(e.sh);
+  if(e && e.iso) parts.push(e.iso.replace("ISO: ","ISO "));
+  if(e && e.zoom) parts.push(e.zoom);
+  lbExif.innerHTML = "";
+  if(!parts.length) return false;
+  const strip = document.createElement("div");
+  strip.className = "lb-paper";
+  strip.textContent = parts.join("  \u00b7  ");
+  lbExif.appendChild(strip);
+  return true;
+}
+
+/* загрузка оригинала с прогрессом */
+async function loadOriginal(src, signal){
+  const res = await fetch(src,{signal});
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  const total = +res.headers.get("Content-Length") || 0;
+  if(!res.body || !total){
+    lbFill.classList.add("indet");
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  }
+  const reader = res.body.getReader();
+  const chunks = [];
+  let got = 0;
+  for(;;){
+    const r = await reader.read();
+    if(r.done) break;
+    chunks.push(r.value);
+    got += r.value.length;
+    lbFill.style.width = Math.min(100, Math.round(got/total*100)) + "%";
+  }
+  return URL.createObjectURL(new Blob(chunks));
+}
+function endProgress(){
+  lbBar.classList.remove("show");
+  lbFill.classList.remove("indet");
+  lbFill.style.width = "0%";
+}
+
+function openLb(pos){
+  const o = PHOTOS[pos];
+  if(!o) return;
+  lbCur = pos;
+  zoomReset();
+  const thumb = thumbOf(o);
+  const wasOpen = lb.classList.contains("open");
+
+  /* кроссфейд старого кадра */
+  if(wasOpen && lbImg.getAttribute("src") && lbImg.complete){
+    let under = document.getElementById("lbUnder");
+    if(!under){
+      under = document.createElement("img");
+      under.id = "lbUnder"; under.alt = "";
+      lb.appendChild(under);
+    }
+    const r = lbImg.getBoundingClientRect();
+    under.src = lbImg.src;
+    under.style.transition = "none";
+    under.style.opacity = "1";
+    under.style.left = r.left + "px";
+    under.style.top = r.top + "px";
+    under.style.width = r.width + "px";
+    under.style.height = r.height + "px";
+    void under.offsetWidth;
+    under.style.transition = "";
+    under.style.opacity = "0";
+    clearTimeout(under._t);
+    under._t = setTimeout(()=>under.remove(), 400);
+  }
+
+  if(thumb !== o.src){
+    lbImg.src = thumb;
+    if(wasOpen){ lbImg.classList.add("ready"); }
+    else{
+      lbImg.classList.remove("ready");
+      const im = new Image();
+      im.src = thumb;
+      const go = ()=>requestAnimationFrame(()=>lbImg.classList.add("ready"));
+      if(im.decode) im.decode().then(go).catch(go); else go();
+    }
+  } else {
+    lbImg.classList.remove("ready");
+    lbImg.removeAttribute("src");
+  }
+  lbCount.textContent = (pos+1)+" / "+PHOTOS.length;
+  lbExif.innerHTML = "";
+  lbExif.parentElement.classList.remove("show");
+  lb.classList.add("open");
+  document.body.style.overflow = "hidden";
+
+  /* ловушка истории: «назад» закрывает фото, а не страницу */
+  if(!lbStatePushed){
+    history.pushState({lb:true}, "", location.href);
+    lbStatePushed = true;
+  }
+
+  exifFor(o).then(e=>{
+    if(lbCur !== pos) return;
+    const has = renderExif(e, e && e.date ? fmtDate(e.date) : null);
+    if(has) requestAnimationFrame(()=>lbExif.parentElement.classList.add("show"));
+  });
+
+  /* оригинал с прогрессом */
+  if(loadCtl) loadCtl.abort();
+  const ctl = new AbortController();
+  loadCtl = ctl;
+  if(lastBlobUrl){ try{ URL.revokeObjectURL(lastBlobUrl) }catch(err){} lastBlobUrl = null; }
+  lbBar.classList.add("show");
+  lbFill.classList.remove("indet");
+  lbFill.style.width = "0%";
+  loadOriginal(o.src, ctl.signal).then(url=>{
+    if(lbCur !== pos || ctl.signal.aborted){ try{ URL.revokeObjectURL(url) }catch(err){} return; }
+    lastBlobUrl = url;
+    endProgress();
+    const im = new Image();
+    im.src = url;
+    const go = ()=>{
+      if(lbCur !== pos) return;
+      lbImg.src = url;
+      requestAnimationFrame(()=>lbImg.classList.add("ready"));
+    };
+    if(im.decode) im.decode().then(go).catch(go); else go();
+  }).catch(()=>{
+    if(ctl.signal.aborted) return;
+    endProgress();
+    const full = new Image();
+    full.src = o.src;
+    const swap = ()=>{
+      if(lbCur !== pos) return;
+      const go = ()=>{
+        lbImg.src = o.src;
+        requestAnimationFrame(()=>lbImg.classList.add("ready"));
+      };
+      if(full.decode) full.decode().then(go).catch(go); else go();
+    };
+    if(full.complete) swap(); else full.onload = swap;
+  });
+}
+
+function closeLb(fromPop){
+  lb.classList.remove("open");
+  document.body.style.overflow = "";
+  if(lbStatePushed && !fromPop){
+    lbStatePushed = false;
+    history.back();
+  }
+}
+addEventListener("popstate", ()=>{
+  if(lb.classList.contains("open")) closeLb(true);
+});
+function step(d){ openLb((lbCur + d + PHOTOS.length) % PHOTOS.length); }
+
+document.getElementById("lbClose").addEventListener("click", ()=>closeLb());
+document.getElementById("lbPrev").addEventListener("click", ()=>step(-1));
+document.getElementById("lbNext").addEventListener("click", ()=>step(1));
+lb.addEventListener("click", e=>{
+  if(e.target.closest(".lb-btn, figcaption")) return;
+  if(zScale > 1 || suppressClick) return;
+  closeLb();
+});
+
+/* ---------- Зум колёсиком ---------- */
+let zScale = 1, zx = 0, zy = 0;
+let dragRef = null, dragged = false, suppressClick = false;
+
+function applyZoom(){
+  lbImg.style.transform = "translate("+zx+"px,"+zy+"px) scale("+zScale+")";
+  lb.classList.toggle("zoomed", zScale > 1);
+}
+function zoomReset(){
+  zScale = 1; zx = 0; zy = 0;
+  lbImg.style.transform = "";
+  lb.classList.remove("zoomed","dragging");
+}
+function zoomAt(cx, cy, target){
+  const r = lbImg.getBoundingClientRect();
+  if(!r.width) return;
+  const ns = Math.min(5, Math.max(1, target));
+  const lx = r.left - zx, ly = r.top - zy;
+  const ratio = ns / zScale;
+  if(ns === 1){ zx = 0; zy = 0; }
+  else{
+    zx = cx - lx - (cx - lx - zx) * ratio;
+    zy = cy - ly - (cy - ly - zy) * ratio;
+    const W = lbImg.offsetWidth * ns, H = lbImg.offsetHeight * ns;
+    zx = Math.min(window.innerWidth  - 80 - lx, Math.max(80 - lx - W, zx));
+    zy = Math.min(window.innerHeight - 80 - ly, Math.max(80 - ly - H, zy));
+  }
+  zScale = ns;
+  applyZoom();
+}
+lb.addEventListener("wheel", e=>{
+  if(!lb.classList.contains("open")) return;
+  e.preventDefault();
+  if(zScale === 1 && e.deltaY > 0) return;
+  zoomAt(e.clientX, e.clientY, zScale * Math.exp(-e.deltaY * 0.0018));
+},{passive:false});
+
+lb.addEventListener("mousedown", e=>{
+  if(!lb.classList.contains("open") || zScale === 1) return;
+  if(e.target.closest(".lb-btn")) return;
+  dragRef = {x:e.clientX, y:e.clientY, zx, zy};
+  dragged = false;
+  lb.classList.add("dragging");
+  e.preventDefault();
+});
+addEventListener("mousemove", e=>{
+  if(!dragRef) return;
+  const dx = e.clientX - dragRef.x, dy = e.clientY - dragRef.y;
+  if(Math.abs(dx) > 4 || Math.abs(dy) > 4) dragged = true;
+  zx = dragRef.zx + dx; zy = dragRef.zy + dy;
+  applyZoom();
+});
+addEventListener("mouseup", ()=>{
+  if(!dragRef) return;
+  dragRef = null;
+  lb.classList.remove("dragging");
+  if(dragged){ suppressClick = true; setTimeout(()=>suppressClick = false, 0); }
+});
+
+lb.addEventListener("dblclick", e=>{
+  if(!lb.classList.contains("open") || e.target.closest(".lb-btn")) return;
+  if(zScale > 1) zoomReset();
+});
+
+/* ---------- Свайпы в лайтбоксе ---------- */
+(function(){
+  const EDGE = 24, MIN_DX = 50;
+  let sx = 0, sy = 0, active = false;
+  lb.addEventListener("touchstart", e=>{
+    if(!lb.classList.contains("open")) return;
+    if(e.touches.length !== 1) return;
+    const x = e.touches[0].clientX;
+    if(x < EDGE || x > window.innerWidth - EDGE) return;
+    sx = x; sy = e.touches[0].clientY; active = true;
+  },{passive:true});
+  lb.addEventListener("touchend", e=>{
+    if(!active) return;
+    active = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Math.abs(dx) > MIN_DX && Math.abs(dx) > Math.abs(dy)*1.5){
+      dx < 0 ? step(1) : step(-1);
+    }
+  },{passive:true});
+  lb.addEventListener("touchcancel", ()=>{ active = false; },{passive:true});
+})();
+</script>
+</body>
+</html>
