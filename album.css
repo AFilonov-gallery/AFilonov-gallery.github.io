@@ -148,9 +148,11 @@ body.lb-open{overflow:hidden}
 
 /* подпись: дата съёмки рукописью, на «подбородке» самой карточки */
 .cap{
-  position:absolute; left:0; right:0; bottom:6px;
+  position:absolute; left:0; right:0; bottom:0;
+  height:48px;                         /* высота подбородка .print */
+  display:flex; align-items:center; justify-content:center;
   font-family:'Marck Script',cursive;
-  font-size:1.08rem;
+  font-size:1.08rem;                   /* <- размер шрифта даты */
   color:#6b5d49;                       /* чернила на светлой бумаге паспарту */
   text-align:center; line-height:1.2;
   pointer-events:none;
@@ -308,7 +310,7 @@ body.lb-open{overflow:hidden}
   .page{width:100%;height:50%;padding:22px 16px;box-shadow:none!important}
   .print img{max-height:calc(50vh - 92px)}
   .print{padding-bottom:40px}
-  .cap{font-size:.92rem;bottom:4px}
+  .cap{font-size:.92rem;height:40px}
   .nav-btn{display:none}
   #ribbon{right:26px}
   .lb-nav{display:none}

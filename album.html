@@ -231,7 +231,7 @@ function cardPhoto(idx){
   card.appendChild(pw);
   const cap = document.createElement("div");
   cap.className = "cap";
-  pr.appendChild(cap);              /* дата живёт в «подбородке» паспарту, на самой карточке */
+  pr.appendChild(cap);
   /* подпись = дата съёмки (из EXIF оригинала; нет метаданных — пусто) */
   exifFor(p).then(e=>{
     const d = e && e.date ? fmtDate(e.date) : null;
