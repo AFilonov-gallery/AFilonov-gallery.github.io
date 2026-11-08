@@ -81,67 +81,57 @@ function fmtShutter(t){
   return t >= 1 ? t.toFixed(1).replace(".0","")+" с" : "1/"+Math.round(1/t);
 }
 
-/* exifr подключён с defer — дожидаемся его перед первым разбором */
-const exifrReady = new Promise(res=>{
-  if(typeof exifr !== "undefined") return res();
-  addEventListener("load", ()=>res(), {once:true});
-});
-
 /* ---------- EXIF (общий кэш по адресу файла) ---------- */
+/* ---------- EXIF: читаем из оригинала /photos/, только начало файла ----------
+   EXIF живёт в первых килобайтах JPEG, поэтому качаем не файл целиком (у оригиналов
+   бывают 9 МБ), а первые 256 КБ потоком и обрываем загрузку. Кэш общий: дата на
+   развороте и полоска в лайтбоксе берутся из одного запроса. */
 const exifCache = new Map();
+const EXIF_HEAD = 262144; /* 256 КБ — запас на развёрнутый EXIF с GPS и превью */
 
-/* читаем только начало файла: EXIF живёт в первых килобайтах JPEG,
-   поэтому качаем не оригинал целиком, а максимум LIMIT байт */
-async function readHead(src, LIMIT){
-  LIMIT = LIMIT || 262144; /* 256 КБ */
-  const res = await fetch(src);
+async function readHead(url){
+  const res = await fetch(url);
   if(!res.ok) throw new Error("HTTP "+res.status);
-  if(!res.body){
-    const b = await res.blob();
-    return b.slice(0, LIMIT).arrayBuffer ? await b.slice(0, LIMIT).arrayBuffer() : b.slice(0, LIMIT);
-  }
+  if(!res.body) return res.blob();              /* потоков нет — файл пришёл целиком */
   const reader = res.body.getReader();
   const chunks = [];
   let got = 0;
   try{
-    while(got < LIMIT){
-      const r = await reader.read();
-      if(r.done) break;
-      chunks.push(r.value);
-      got += r.value.length;
+    while(got < EXIF_HEAD){
+      const {done, value} = await reader.read();
+      if(done) break;
+      chunks.push(value); got += value.length;
     }
-  }finally{
-    try{ reader.cancel(); }catch(e){}
+  } finally {
+    try{ reader.cancel() }catch(e){}            /* остальное не качаем */
   }
   return new Blob(chunks).arrayBuffer();
 }
+
 async function exifFor(p){
   const src = (typeof p === "string") ? p : p.src;
   if(typeof p === "object" && p && p.exif) return p.exif;
   if(exifCache.has(src)) return exifCache.get(src);
   let e = null;
   try{
-    await exifrReady;              /* не разбираем, пока библиотека не пришла */
     if(typeof exifr !== "undefined"){
-      const buf = await readHead(src);   /* оригинал, только начало */
-      if(buf){
-        const d = await exifr.parse(buf,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFormat","DigitalZoomRatio","DateTimeOriginal","CreateDate","ModifyDate"]});
-        if(d){
-          e = {
-            date: d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null,
-            cam: d.Model || null,
-            ap: d.FNumber ? ("f/"+(Number.isInteger(d.FNumber)?d.FNumber:d.FNumber.toFixed(1))) : null,
-            sh: fmtShutter(d.ExposureTime),
-            iso: d.ISO ? ("ISO: "+d.ISO) : null,
-            fl: d.FocalLength ? (Math.round(d.FocalLength)+" мм") : null,
-            fl35: d.FocalLengthIn35mmFormat && d.FocalLengthIn35mmFormat > 1 ? (Math.round(d.FocalLengthIn35mmFormat)+" мм") : null,
-            zoom: d.DigitalZoomRatio && d.DigitalZoomRatio > 1 ? ("Зум ×"+d.DigitalZoomRatio.toFixed(1)) : null
-          };
-        }
+      const buf = await readHead(src);
+      const d = await exifr.parse(buf,{pick:["Model","FNumber","ExposureTime","ISO","FocalLength","FocalLengthIn35mmFormat","DigitalZoomRatio","DateTimeOriginal","CreateDate","ModifyDate"]});
+      if(d){
+        e = {
+          date: d.DateTimeOriginal || d.CreateDate || d.ModifyDate || null,
+          cam: d.Model || null,
+          ap: d.FNumber ? ("f/"+(Number.isInteger(d.FNumber)?d.FNumber:d.FNumber.toFixed(1))) : null,
+          sh: fmtShutter(d.ExposureTime),
+          iso: d.ISO ? ("ISO: "+d.ISO) : null,
+          fl: d.FocalLength ? (Math.round(d.FocalLength)+" мм") : null,
+          fl35: d.FocalLengthIn35mmFormat && d.FocalLengthIn35mmFormat > 1 ? (Math.round(d.FocalLengthIn35mmFormat)+" мм") : null,
+          zoom: d.DigitalZoomRatio && d.DigitalZoomRatio > 1 ? ("Зум ×"+d.DigitalZoomRatio.toFixed(1)) : null
+        };
       }
     }
-  }catch(err){ /* нет EXIF, файл недоступен или fetch запрещён */ }
-  if(typeof exifr !== "undefined") exifCache.set(src, e);
+  }catch(err){ /* нет EXIF или файл недоступен */ }
+  exifCache.set(src, e);
   return e;
 }
 
@@ -226,7 +216,7 @@ function cardPhoto(idx){
   const cap = document.createElement("div");
   cap.className = "cap";
   card.appendChild(cap);
-  /* подпись = дата съёмки (EXIF читаем из начала оригинала) */
+  /* подпись = дата съёмки (из EXIF оригинала; нет метаданных — пусто) */
   exifFor(p).then(e=>{
     const d = e && e.date ? fmtDate(e.date) : null;
     if(d) cap.textContent = d;
@@ -564,12 +554,24 @@ function openLb(pos){
   });
 }
 
+/* какой разворот показывает кадр idx (null — не найден) */
+function spreadOfPhoto(idx){
+  if(!spreads) return null;
+  for(let i=0;i<spreads.length;i++) if(spreads[i].indexOf(idx) !== -1) return i;
+  return null;
+}
 function closeLb(fromPop){
   lb.classList.remove("open");
   document.body.style.overflow = "";
   if(lbStatePushed && !fromPop){
     lbStatePushed = false;
     history.back();
+  }
+  /* альбом открывается на развороте кадра, который смотрели последним:
+     пролистали в лайтбоксе 15 фото — книга перелистнёт к ним */
+  if(spreads){
+    const si = spreadOfPhoto(lbCur);
+    if(si !== null) go(si + 1); /* +1: лист 0 — обложка */
   }
 }
 addEventListener("popstate", ()=>{
