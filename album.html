@@ -89,6 +89,18 @@ function fmtShutter(t){
 const exifCache = new Map();
 const EXIF_HEAD = 262144; /* 256 КБ — запас на развёрнутый EXIF с GPS и превью */
 
+/* exifr подключён с defer — инлайн-скрипт стартует раньше.
+   Ждём библиотеку перед первым обращением, иначе первый вызов
+   запишет null в кэш навсегда (лимит ожидания — 20 с). */
+const exifrReady = new Promise(done=>{
+  const t0 = Date.now();
+  (function poll(){
+    if(typeof exifr !== "undefined") done();
+    else if(Date.now()-t0 < 20000) setTimeout(poll, 100);
+    else done();
+  })();
+});
+
 async function readHead(url){
   const res = await fetch(url);
   if(!res.ok) throw new Error("HTTP "+res.status);
@@ -111,6 +123,7 @@ async function readHead(url){
 async function exifFor(p){
   const src = (typeof p === "string") ? p : p.src;
   if(typeof p === "object" && p && p.exif) return p.exif;
+  await exifrReady;
   if(exifCache.has(src)) return exifCache.get(src);
   let e = null;
   try{
