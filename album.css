@@ -116,21 +116,25 @@ body.lb-open{overflow:hidden}
 .pwrap{
   position:relative;
   transform:rotate(var(--tilt,0deg));
-  transition:transform .22s ease;
+  transition:transform .17s ease;
 }
 .print{
   position:relative;
+  z-index:1;
   background:var(--mat);
   padding:10px 10px 14px;
   box-shadow:0 4px 16px rgba(0,0,0,.55), 0 1px 3px rgba(0,0,0,.4);
-  transition:transform .22s ease, box-shadow .22s ease;
+  transition:transform .17s ease, box-shadow .17s ease;
   cursor:pointer;
 }
-/* наведение: обёртка выпрямляется, фото приподнимается и растёт из-под уголков */
+/* наведение: обёртка выпрямляется, фото приподнимается и растёт;
+   уголки (z-index:2) остаются на местах, фото (z-index:3) выходит из-под них */
 .card:hover .pwrap{transform:rotate(0deg)}
-.card:hover .print{transform:translateY(-6px) scale(1.07)}
+.card:hover .print{transform:translateY(-4px) scale(1.07); z-index:3}
+/* вынимание по клику: тоже выпрямляем обёртку, но z-index не поднимаем —
+   кадр уезжает ИЗ-ПОД уголков, они остаются лежать сверху */
 .card.lifting .pwrap{transform:rotate(0deg)}
-.card.lifting .print{transform:translateY(-14px) scale(1.07)}
+.card.lifting .print{transform:translateY(-12px) scale(1.07) rotate(0deg)}
 .print img{
   display:block;
   max-width:100%;
